@@ -8,6 +8,8 @@ sealed abstract class LogEntry {
 
 object LogEntry {
 
+  val fsSep = sys props "file.separator"
+
   case class Close(epoch: String, fd: String, status: Int, time: String) extends LogEntry
 
   object Close {
@@ -58,6 +60,20 @@ object LogEntry {
     }
   }
 
+  case class OpenAt(epoch: String, wherefd: String, filename: String, status: Int, time: String) extends LogEntry {
+    def file(path: String) = s"""$path$fsSep$filename"""
+    def fd = status.toString
+  }
+
+  object OpenAt {
+    val regex = """(\d+\.\d+) openat\((\d+|AT_FDCWD), "([^"]+)", .+\)\s+= (\d+) <(\d+\.\d+)>""".r
+    def unapply(line: String): Option[OpenAt] = line match {
+      case regex(epoch, wherefd, file, status, time) =>
+        Some(new OpenAt(epoch, wherefd, file, status.toInt, time))
+      case _ => None
+    }
+  }
+
   case class Pipe(epoch: String, read: String, write: String, status: Int, time: String) extends LogEntry
 
   object Pipe {
@@ -69,28 +85,28 @@ object LogEntry {
     }
   }
 
-  case class Read(epoch: String, fd: String, status: Int, time: String) extends LogEntry {
-    def bytes = status
+  case class Read(epoch: String, fd: String, bytes: Long, time: String) extends LogEntry {
+    def status = bytes.toInt
   }
 
   object Read {
     val regex = """(\d+\.\d+) read\((\d+), .+\)\s+= (\d+) <(\d+\.\d+)>""".r
     def unapply(line: String): Option[Read] = line match {
-      case regex(epoch, fd, status, time) =>
-        Some(new Read(epoch, fd, status.toInt, time))
+      case regex(epoch, fd, bytes, time) =>
+        Some(new Read(epoch, fd, bytes.toLong, time))
       case _ => None
     }
   }
 
-  case class Write(epoch: String, fd: String, status: Int, time: String) extends LogEntry {
-    def bytes = status
+  case class Write(epoch: String, fd: String, bytes: Long, time: String) extends LogEntry {
+    def status = bytes.toInt
   }
 
   object Write {
     val regex = """(\d+\.\d+) write\((\d+), .+\)\s+= (\d+) <(\d+\.\d+)>""".r
     def unapply(line: String): Option[Write] = line match {
-      case regex(epoch, fd, status, time) =>
-        Some(new Write(epoch, fd, status.toInt, time))
+      case regex(epoch, fd, bytes, time) =>
+        Some(new Write(epoch, fd, bytes.toLong, time))
       case _ => None
     }
   }

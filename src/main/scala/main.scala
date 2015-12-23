@@ -31,6 +31,12 @@ object Main extends App {
       fdDB += (open.fd -> open.file)
       open
 
+    case LogEntry.OpenAt(openat) if openat.status >= 0 =>
+      val where = fdDB get openat.wherefd
+      val file = where.fold(openat.filename)(openat.file)
+      fdDB += (openat.fd -> file)
+      openat
+
     case LogEntry.Pipe(pipe) if pipe.status >= 0 =>
       fdDB += (pipe.read -> "PIPE")
       fdDB += (pipe.write -> "PIPE")
