@@ -1,4 +1,6 @@
 enablePlugins(GitVersioning)
+enablePlugins(JavaAppPackaging)
+enablePlugins(LinuxPlugin)
 
 organization in ThisBuild := "com.github.wookietreiber"
 
