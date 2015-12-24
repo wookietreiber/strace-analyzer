@@ -102,7 +102,9 @@ class IO(config: Config) {
 
     def bps = bytes / seconds
 
-    def msg = s"""read $bytes bytes in $seconds seconds ($bps b/s) with $ops ops"""
+    def bpo = bytes.toDouble / ops
+
+    def msg = s"""read $bytes bytes in $seconds seconds ($bps b/s) with $ops ops ($bpo b/o)"""
   }
 
   object ReadAnalysis {
@@ -124,7 +126,9 @@ class IO(config: Config) {
 
     def bps = bytes / seconds
 
-    def msg = s"""wrote $bytes bytes in $seconds seconds ($bps b/s) with $ops ops"""
+    def bpo = bytes.toDouble / ops
+
+    def msg = s"""wrote $bytes bytes in $seconds seconds ($bps b/s) with $ops ops ($bpo b/o)"""
   }
 
   object WriteAnalysis {
