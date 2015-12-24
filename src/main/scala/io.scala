@@ -93,42 +93,46 @@ class IO(config: Config) {
     }
   }
 
-  case class ReadAnalysis(bytes: Long, seconds: Double) {
+  case class ReadAnalysis(bytes: Long, ops: Long, seconds: Double) {
     def +(that: ReadAnalysis): ReadAnalysis = ReadAnalysis (
       bytes = this.bytes + that.bytes,
+      ops = this.ops + that.ops,
       seconds = this.seconds + that.seconds
     )
 
     def bps = bytes / seconds
 
-    def msg = s"""read $bytes bytes in $seconds seconds"""
+    def msg = s"""read $bytes bytes in $seconds seconds ($bps b/s) with $ops ops"""
   }
 
   object ReadAnalysis {
-    val empty = ReadAnalysis(0L, 0.0)
+    val empty = ReadAnalysis(0L, 0L, 0.0)
 
     def apply(read: LogEntry.Read): ReadAnalysis = ReadAnalysis (
       bytes = read.bytes,
+      ops = 1,
       seconds = read.time.toDouble
     )
   }
 
-  case class WriteAnalysis(bytes: Long, seconds: Double) {
+  case class WriteAnalysis(bytes: Long, ops: Long, seconds: Double) {
     def +(that: WriteAnalysis): WriteAnalysis = WriteAnalysis (
       bytes = this.bytes + that.bytes,
+      ops = this.ops + that.ops,
       seconds = this.seconds + that.seconds
     )
 
     def bps = bytes / seconds
 
-    def msg = s"""wrote $bytes bytes in $seconds seconds"""
+    def msg = s"""wrote $bytes bytes in $seconds seconds ($bps b/s) with $ops ops"""
   }
 
   object WriteAnalysis {
-    val empty = WriteAnalysis(0L, 0.0)
+    val empty = WriteAnalysis(0L, 0L, 0.0)
 
     def apply(write: LogEntry.Write): WriteAnalysis = WriteAnalysis (
       bytes = write.bytes,
+      ops = 1,
       seconds = write.time.toDouble
     )
   }
