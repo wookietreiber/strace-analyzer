@@ -3,16 +3,18 @@ package analyze
 
 import java.io.File
 
+// TODO scalaz-stream / fs2
 class IO(config: Config) {
-
-  // TODO if "-" read from STDIN
-  // TODO scalaz-stream / fs2
 
   if (config.logs.isEmpty)
     handleLog(io.Source.stdin)
   else
-    config.logs foreach { logFile =>
-      val source = io.Source.fromFile(logFile)
+    config.logs.distinct foreach { logFile =>
+      val source = if (logFile.getName == "-")
+        io.Source.stdin
+      else
+        io.Source.fromFile(logFile)
+
       try {
         handleLog(source)
       } finally {
@@ -21,7 +23,6 @@ class IO(config: Config) {
     }
 
   def handleLog(log: io.Source): Unit = {
-
     val fdDB = collection.mutable.Map[String,String]()
 
     val entries: List[LogEntry] = log.getLines.collect({
