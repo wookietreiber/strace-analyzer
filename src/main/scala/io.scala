@@ -4,16 +4,14 @@ package analyze
 import java.io.File
 
 // TODO scalaz-stream / fs2
+// TODO scopt apparently incapable of handling - as a file
 class IO(config: Config) {
 
   if (config.logs.isEmpty)
     handleLog(io.Source.stdin)
   else
     config.logs.distinct foreach { logFile =>
-      val source = if (logFile.getName == "-")
-        io.Source.stdin
-      else
-        io.Source.fromFile(logFile)
+      val source = io.Source.fromFile(logFile)
 
       try {
         handleLog(source)
