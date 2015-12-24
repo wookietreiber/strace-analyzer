@@ -67,13 +67,13 @@ class IO(config: Config) {
     }
 
     val readAnalysis = reads.groupBy(_.fd) mapValues { entries =>
-      entries.foldLeft(ReadAnalysis.empty)(_ + ReadAnalysis(_))
+      entries.foldLeft(FileSummary.empty("read"))(_ + FileSummary(_))
     }
 
-    readAnalysis.toSeq sortBy { _._2.bps } foreach {
+    readAnalysis foreach {
       case (file,analysis)
           if config.regex.map(_.findFirstIn(file).isDefined).orElse(config.filter.map(file.contains)).getOrElse(true) =>
-        println(s"""$file ${analysis.msg}""")
+        println(analysis.msg(file))
       case _ =>
     }
 
@@ -82,19 +82,20 @@ class IO(config: Config) {
     }
 
     val writeAnalysis = writes.groupBy(_.fd) mapValues { entries =>
-      entries.foldLeft(WriteAnalysis.empty)(_ + WriteAnalysis(_))
+      entries.foldLeft(FileSummary.empty("write"))(_ + FileSummary(_))
     }
 
-    writeAnalysis.toSeq sortBy { _._2.bps } foreach {
+    writeAnalysis foreach {
       case (file,analysis)
           if config.regex.map(_.findFirstIn(file).isDefined).orElse(config.filter.map(file.contains)).getOrElse(true) =>
-        println(s"""$file ${analysis.msg}""")
+        println(analysis.msg(file))
       case _ =>
     }
   }
 
-  case class ReadAnalysis(bytes: Long, ops: Long, seconds: Double) {
-    def +(that: ReadAnalysis): ReadAnalysis = ReadAnalysis (
+  case class FileSummary(op: String, bytes: Long, ops: Long, seconds: Double) {
+    def +(that: FileSummary): FileSummary = FileSummary (
+      op = this.op,
       bytes = this.bytes + that.bytes,
       ops = this.ops + that.ops,
       seconds = this.seconds + that.seconds
@@ -104,41 +105,25 @@ class IO(config: Config) {
 
     def bpo = bytes.toDouble / ops
 
-    def msg = s"""read $bytes bytes in $seconds seconds ($bps b/s) with $ops ops ($bpo b/o)"""
+    def hBytes = Memory.humanize(bytes)
+
+    def hSeconds = Duration.humanize(seconds)
+
+    def hbps = Memory.humanize(bps.round)
+
+    def hbpo = Memory.humanize(bpo.round)
+
+    def msg(file: String) = s"""$op $hBytes in $hSeconds (~ $hbps / s) with $ops ops (~ $hbpo / o) $file"""
   }
 
-  object ReadAnalysis {
-    val empty = ReadAnalysis(0L, 0L, 0.0)
+  object FileSummary {
+    def empty(op: String) = FileSummary(op, bytes = 0L, ops = 0L, seconds = 0.0)
 
-    def apply(read: LogEntry.Read): ReadAnalysis = ReadAnalysis (
-      bytes = read.bytes,
-      ops = 1,
-      seconds = read.time.toDouble
-    )
-  }
+    def apply(read: LogEntry.Read): FileSummary =
+      FileSummary(op = "read", bytes = read.bytes, ops = 1, seconds = read.time.toDouble)
 
-  case class WriteAnalysis(bytes: Long, ops: Long, seconds: Double) {
-    def +(that: WriteAnalysis): WriteAnalysis = WriteAnalysis (
-      bytes = this.bytes + that.bytes,
-      ops = this.ops + that.ops,
-      seconds = this.seconds + that.seconds
-    )
-
-    def bps = bytes / seconds
-
-    def bpo = bytes.toDouble / ops
-
-    def msg = s"""wrote $bytes bytes in $seconds seconds ($bps b/s) with $ops ops ($bpo b/o)"""
-  }
-
-  object WriteAnalysis {
-    val empty = WriteAnalysis(0L, 0L, 0.0)
-
-    def apply(write: LogEntry.Write): WriteAnalysis = WriteAnalysis (
-      bytes = write.bytes,
-      ops = 1,
-      seconds = write.time.toDouble
-    )
+    def apply(write: LogEntry.Write): FileSummary =
+      FileSummary(op = "write", bytes = write.bytes, ops = 1, seconds = write.time.toDouble)
   }
 
 }
