@@ -2,6 +2,7 @@ package strace
 package analyze
 
 import java.io.File
+import scala.util.matching.Regex
 
 object Analyzer extends App {
 
@@ -26,7 +27,11 @@ object Analyzer extends App {
     } children (
       opt[String]("filter") action { (x, c) =>
         c.copy(filter = Some(x))
-      } text("filenames/paths must contain this string") valueName("path"),
+      } text("filenames/paths must contain this string (exact match)") valueName("path"),
+
+      opt[String]("regex") action { (x, c) =>
+        c.copy(regex = Some(x.r))
+      } text("filenames/paths must match in part this regex (regex has more weight than exact match)") valueName("regex"),
 
       arg[File]("<log1> <log2> ...") optional() unbounded() text (
         "strace log files, reads from STDIN if none are given"

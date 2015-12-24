@@ -73,7 +73,8 @@ class IO(config: Config) {
     }
 
     readAnalysis.toSeq sortBy { _._2.bps } foreach {
-      case (file,analysis) if config.filter.map(file.contains).getOrElse(true) =>
+      case (file,analysis)
+          if config.regex.map(_.findFirstIn(file).isDefined).orElse(config.filter.map(file.contains)).getOrElse(true) =>
         println(s"""$file ${analysis.msg}""")
       case _ =>
     }
@@ -87,7 +88,8 @@ class IO(config: Config) {
     }
 
     writeAnalysis.toSeq sortBy { _._2.bps } foreach {
-      case (file,analysis) if config.filter.map(file.contains).getOrElse(true) =>
+      case (file,analysis)
+          if config.regex.map(_.findFirstIn(file).isDefined).orElse(config.filter.map(file.contains)).getOrElse(true) =>
         println(s"""$file ${analysis.msg}""")
       case _ =>
     }
