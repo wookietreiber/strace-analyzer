@@ -6,6 +6,6 @@ lazy val root = (project in file(".")).
     organization := "com.github.wookietreiber",
     scalaVersion := "2.11.7",
     libraryDependencies += "com.github.scopt" %% "scopt" % "3.3.0",
-    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
-    buildInfoPackage := "strace"
+    buildInfoKeys := Seq[BuildInfoKey](name, version),
+    buildInfoPackage := "strace.analyze"
   )

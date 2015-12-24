@@ -1,4 +1,5 @@
 package strace
+package analyze
 
 sealed abstract class LogEntry {
   def epoch: String

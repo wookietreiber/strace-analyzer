@@ -1,10 +1,11 @@
 package strace
+package analyze
 
 import java.io.File
 
-class IO(config: Main.Config) {
+class IO(config: Config) {
 
-  // TODO if no file or "-" read from STDIN
+  // TODO if "-" read from STDIN
   // TODO scalaz-stream / fs2
 
   if (config.logs.isEmpty)

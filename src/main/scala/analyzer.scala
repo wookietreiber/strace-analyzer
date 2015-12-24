@@ -1,10 +1,9 @@
 package strace
+package analyze
 
 import java.io.File
 
-object Main extends App {
-
-  case class Config(command: String = "", logs: List[File] = Nil)
+object Analyzer extends App {
 
   def noteText = s"""|Generate logs like this:
                      |
