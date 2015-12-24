@@ -24,6 +24,10 @@ object Analyzer extends App {
     cmd("io") text("The io command compiles a read/write operation summary.") action { (_, c) =>
       c.copy(command = "io")
     } children (
+      opt[String]("filter") action { (x, c) =>
+        c.copy(filter = Some(x))
+      } text("filenames/paths must contain this string") valueName("path"),
+
       arg[File]("<log1> <log2> ...") optional() unbounded() text (
         "strace log files, reads from STDIN if none are given"
       ) action { (x, c) =>

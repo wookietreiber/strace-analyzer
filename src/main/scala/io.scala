@@ -73,8 +73,9 @@ class IO(config: Config) {
     }
 
     readAnalysis.toSeq sortBy { _._2.bps } foreach {
-      case (file,analysis) =>
+      case (file,analysis) if config.filter.map(file.contains).getOrElse(true) =>
         println(s"""$file ${analysis.msg}""")
+      case _ =>
     }
 
     val writes = entries collect {
@@ -86,8 +87,9 @@ class IO(config: Config) {
     }
 
     writeAnalysis.toSeq sortBy { _._2.bps } foreach {
-      case (file,analysis) =>
+      case (file,analysis) if config.filter.map(file.contains).getOrElse(true) =>
         println(s"""$file ${analysis.msg}""")
+      case _ =>
     }
   }
 
