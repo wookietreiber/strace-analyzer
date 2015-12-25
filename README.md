@@ -3,6 +3,7 @@ strace-analyzer
 
 Analyzes [strace][] output. Currently, the following analysis commands are provided:
 
+- **summary** (default) short summary
 - **read** per file read summary
 - **write** per file write summary
 - **io** does both **read** and **write**
