@@ -40,15 +40,25 @@ caveats, missing features
 -   does not parse unfinished / resumed entries, single-threaded application runs are recommended or
     else you are going to miss a lot of entries
 
+In the spirit of the Unix philosohpy of **do one thing and do it well**, strace-analyzer will not do
+any of the following:
+
+-   this tool will not implement filtering, use tools like [grep][] or [awk][], e.g.:
+
+        strace-analyzer read strace.log.1835 | grep scala
+        strace-analyzer read strace.log.1835 | awk '/scala/'
+
 -   this tool will not implement sorting, use the [sort][] command line utility, e.g.:
 
-        strace-analyzer read ~/strace.log.27049 | sort -h -k 2
+        strace-analyzer read strace.log.27049 | sort -h -k 2
 
 -   this tool will not implement pretty tabular output printing, use the [column][] command line
     utility, e.g.:
 
-        strace-analyzer read ~/strace.log.27049 | column -t
+        strace-analyzer read strace.log.27049 | column -t
 
+[awk]: http://man7.org/linux/man-pages/man1/gawk.1.html "gawk man page"
+[grep]: http://man7.org/linux/man-pages/man1/grep.1.html "grep man page"
 [column]: http://man7.org/linux/man-pages/man1/column.1.html "column man page"
 [sort]: http://man7.org/linux/man-pages/man1/sort.1.html "sort man page"
 [strace]: http://sourceforge.net/projects/strace/ "strace home page"

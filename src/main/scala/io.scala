@@ -70,16 +70,12 @@ trait HasFileSummary {
       case entry: LogEntry.Read => entry
     }
 
-    val readAnalysis = reads.groupBy(_.fd) mapValues { entries =>
+    val analysis = reads.groupBy(_.fd) mapValues { entries =>
       entries.foldLeft(FileSummary.empty("read"))(_ + FileSummary(_))
     }
 
-    readAnalysis foreach {
-      case (file,analysis)
-          if config.regex.map(_.findFirstIn(file).isDefined).orElse(config.filter.map(file.contains)).getOrElse(true) =>
-        println(analysis.msg(file))
-      case _ =>
-    }
+    for ((file,analysis) <- analysis)
+      println(analysis.msg(file))
   }
 
   def writeAnalysis(entries: List[LogEntry])(implicit config: Config): Unit = {
@@ -87,16 +83,12 @@ trait HasFileSummary {
       case entry: LogEntry.Write => entry
     }
 
-    val writeAnalysis = writes.groupBy(_.fd) mapValues { entries =>
+    val analysis = writes.groupBy(_.fd) mapValues { entries =>
       entries.foldLeft(FileSummary.empty("write"))(_ + FileSummary(_))
     }
 
-    writeAnalysis foreach {
-      case (file,analysis)
-          if config.regex.map(_.findFirstIn(file).isDefined).orElse(config.filter.map(file.contains)).getOrElse(true) =>
-        println(analysis.msg(file))
-      case _ =>
-    }
+    for ((file,analysis) <- analysis)
+      println(analysis.msg(file))
   }
 
   case class FileSummary(op: String, bytes: Long, ops: Long, seconds: Double) {
