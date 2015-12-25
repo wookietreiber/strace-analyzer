@@ -31,8 +31,8 @@ More help can be found here:
 strace --help
 ```
 
-caveats, missing features
--------------------------
+caveats
+-------
 
 -   does only work with traces created with the usage example above, there is no support for logs
     that contain output of multiple process ids
@@ -40,20 +40,22 @@ caveats, missing features
 -   does not parse unfinished / resumed entries, single-threaded application runs are recommended or
     else you are going to miss a lot of entries
 
+features that will not be implemented
+-------------------------------------
+
 In the spirit of the Unix philosohpy of **do one thing and do it well**, strace-analyzer will not do
 any of the following:
 
--   this tool will not implement filtering, use tools like [grep][] or [awk][], e.g.:
+-   filtering, use tools like [grep][] or [awk][], e.g.:
 
         strace-analyzer read strace.log.1835 | grep scala
         strace-analyzer read strace.log.1835 | awk '/scala/'
 
--   this tool will not implement sorting, use the [sort][] command line utility, e.g.:
+-   sorting, use the [sort][] command line utility, e.g.:
 
         strace-analyzer read strace.log.27049 | sort -h -k 2
 
--   this tool will not implement pretty tabular output printing, use the [column][] command line
-    utility, e.g.:
+-   pretty tabular output printing, use the [column][] command line utility, e.g.:
 
         strace-analyzer read strace.log.27049 | column -t
 
