@@ -1,15 +1,15 @@
 strace-analyzer
 ---------------
 
-Analyzes strace output. Currently, the following analysis commands are provided:
+Analyzes [strace][] output. Currently, the following analysis commands are provided:
 
 - **read** per file read summary
 - **write** per file write summary
-- **io**: does both **read** and **write**
+- **io** does both **read** and **write**
 
-File descriptors are associated with file names via an internal database. This database gets updated
-when syscalls like **open**, **creat**, **dup** or **pipe** are read from the log as well as when
-the file descriptors get **close**d.
+File descriptors are associated with file names. The association is made when syscalls like
+**open**, **creat**, **dup** or **pipe** are read from the log and the association gets terminated
+when they get **close**d.
 
 usage
 -----
@@ -36,12 +36,19 @@ caveats, missing features
 
 -   does only work with traces created with the usage example above, there is no support for logs
     that contain output of multiple process ids
--   does not parse unfinished / resumed entries, so single-threaded is recommended or else you are
-    going to miss a lot of entries
--   this tool will not implement sorting, use the `sort` command line utility, e.g.:
+
+-   does not parse unfinished / resumed entries, single-threaded application runs are recommended or
+    else you are going to miss a lot of entries
+
+-   this tool will not implement sorting, use the [sort][] command line utility, e.g.:
 
         strace-analyzer read ~/strace.log.27049 | sort -h -k 2
--   this tool will not implement pretty tabular output printing, use the `column` command line
+
+-   this tool will not implement pretty tabular output printing, use the [column][] command line
     utility, e.g.:
 
         strace-analyzer read ~/strace.log.27049 | column -t
+
+[column]: http://man7.org/linux/man-pages/man1/column.1.html "column man page"
+[sort]: http://man7.org/linux/man-pages/man1/sort.1.html "sort man page"
+[strace]: http://sourceforge.net/projects/strace/ "strace home page"
