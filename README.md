@@ -17,19 +17,19 @@ usage
 
 ```bash
 # create logs
-strace -T -ttt -ff -o strace.log command
+strace -T -ttt -ff -o strace.log app
 
 # analyze logs (command defines how they are analyzed)
-strace-analyzer <command> strace.log.4242 strace.log.4243
+strace-analyzer command strace.log.4242 strace.log.4243
 
-# do stuff with the output
-strace-analyzer read strace.log.27049 | sort -h -k 2 | column -t
+# pipelining, ignore the useless use of cat, this is just an example ;-)
+cat strace.log.27049 | strace-analyzer read | column -t
 ```
 
 More help can be found here:
 
 ```bash
-strace --help
+strace-analyzer --help
 ```
 
 caveats
@@ -52,6 +52,9 @@ issues, features, use-cases, wish list
     without a note as to why it could not be identified, please [open an issue][newissue] and
     provide access to that particular, complete strace log, so I am able to identify the problem.
 
+    If you know that a particular file should be included, because you know that file has been
+    opened, it would be of great help if you would name these files in the issue.
+
 features that will not be implemented
 -------------------------------------
 
@@ -72,6 +75,7 @@ any of the following:
         strace-analyzer read strace.log.27049 | column -t
 
 [awk]: http://man7.org/linux/man-pages/man1/gawk.1.html "gawk man page"
+[uucaletter]: http://porkmail.org/era/unix/award.html#uucaletter "useless use of cat award form letter"
 [grep]: http://man7.org/linux/man-pages/man1/grep.1.html "grep man page"
 [column]: http://man7.org/linux/man-pages/man1/column.1.html "column man page"
 [newissue]: https://github.com/wookietreiber/strace-analyzer/issues/new "open new issue"
