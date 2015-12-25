@@ -8,11 +8,13 @@ trait HasFileSummary {
     }
 
     val analysis = reads.groupBy(_.fd) mapValues { entries =>
-      entries.foldLeft(FileSummary.empty("read"))(_ + FileSummary(_))
+      entries.foldLeft(FileSummary.empty)(_ + FileSummary(_))
     }
 
-    for ((file,analysis) <- analysis)
-      println(analysis.msg(file))
+    for ((file,analysis) <- analysis) {
+      val output = analysis.humanized(op = "read")
+      println(s"""$output $file""")
+    }
   }
 
   def writeAnalysis(entries: List[LogEntry])(implicit config: Config): Unit = {
@@ -21,44 +23,41 @@ trait HasFileSummary {
     }
 
     val analysis = writes.groupBy(_.fd) mapValues { entries =>
-      entries.foldLeft(FileSummary.empty("write"))(_ + FileSummary(_))
+      entries.foldLeft(FileSummary.empty)(_ + FileSummary(_))
     }
 
-    for ((file,analysis) <- analysis)
-      println(analysis.msg(file))
+    for ((file,analysis) <- analysis) {
+      val output = analysis.humanized(op = "write")
+      println(s"""$output $file""")
+    }
   }
 
-  case class FileSummary(op: String, bytes: Long, ops: Long, seconds: Double) {
+  case class FileSummary(bytes: Long, ops: Long, seconds: Double) {
     def +(that: FileSummary): FileSummary = FileSummary (
-      op = this.op,
       bytes = this.bytes + that.bytes,
       ops = this.ops + that.ops,
       seconds = this.seconds + that.seconds
     )
 
     def bps = bytes / seconds
-
     def bpo = bytes.toDouble / ops
-
     def hBytes = Memory.humanize(bytes)
-
     def hSeconds = Duration.humanize(seconds)
-
     def hbps = Memory.humanize(bps.round)
-
     def hbpo = Memory.humanize(bpo.round)
 
-    def msg(file: String) = s"""$op $hBytes in $hSeconds (~ $hbps / s) with $ops ops (~ $hbpo / op) $file"""
+    def humanized(op: String) =
+      s"""$op $hBytes in $hSeconds (~ $hbps / s) with $ops ops (~ $hbpo / op)"""
   }
 
   object FileSummary {
-    def empty(op: String) = FileSummary(op, bytes = 0L, ops = 0L, seconds = 0.0)
+    val empty = FileSummary(bytes = 0L, ops = 0L, seconds = 0.0)
 
     def apply(read: LogEntry.Read): FileSummary =
-      FileSummary(op = "read", bytes = read.bytes, ops = 1, seconds = read.time.toDouble)
+      FileSummary(bytes = read.bytes, ops = 1, seconds = read.time.toDouble)
 
     def apply(write: LogEntry.Write): FileSummary =
-      FileSummary(op = "write", bytes = write.bytes, ops = 1, seconds = write.time.toDouble)
+      FileSummary(bytes = write.bytes, ops = 1, seconds = write.time.toDouble)
   }
 }
 
