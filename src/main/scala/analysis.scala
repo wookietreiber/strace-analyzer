@@ -49,7 +49,11 @@ abstract class Analysis {
 
   /** Returns a parsed strace log. */
   def parseLog(log: io.Source): List[LogEntry] = try {
-    val fdDB = collection.mutable.Map[String,String]()
+    val fdDB = collection.mutable.Map[String,String] (
+      "0" -> "STDIN",
+      "1" -> "STDOUT",
+      "2" -> "STDERR"
+    )
 
     log.getLines.collect({
       case LogEntry.Close(close) if close.status >= 0 =>
