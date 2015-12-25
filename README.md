@@ -41,6 +41,17 @@ caveats
 -   does not parse unfinished / resumed entries, single-threaded application runs are recommended or
     else you are going to miss a lot of entries
 
+issues, features, use-cases, wish list
+--------------------------------------
+
+-   If you think of a new (possibly high-level) analysis use case or how to improve an existing one,
+    please [open an issue][newissue]. If you have an idea on how the output should look like, feel
+    free to include a sketch of an example.
+
+-   If you recognize missing file associations in the output, i.e. bare file descriptor numbers
+    without a note as to why it could not be identified, please [open an issue][newissue] and
+    provide access to that particular, complete strace log, so I am able to identify the problem.
+
 features that will not be implemented
 -------------------------------------
 
@@ -63,5 +74,6 @@ any of the following:
 [awk]: http://man7.org/linux/man-pages/man1/gawk.1.html "gawk man page"
 [grep]: http://man7.org/linux/man-pages/man1/grep.1.html "grep man page"
 [column]: http://man7.org/linux/man-pages/man1/column.1.html "column man page"
+[newissue]: https://github.com/wookietreiber/strace-analyzer/issues/new "open new issue"
 [sort]: http://man7.org/linux/man-pages/man1/sort.1.html "sort man page"
 [strace]: http://sourceforge.net/projects/strace/ "strace home page"
