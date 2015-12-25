@@ -72,6 +72,19 @@ object LogEntry {
     }
   }
 
+  case class Dup2(epoch: String, oldFd: String, newFd: String, time: String) extends LogEntry {
+    def status = newFd.toInt
+  }
+
+  object Dup2 {
+    val regex = """(\d+\.\d+) dup2\((\d+), \d+\)\s+= (\d+) <(\d+\.\d+)>""".r
+    def unapply(line: String): Option[Dup2] = line match {
+      case regex(epoch, oldFd, newFd, time) =>
+        Some(new Dup2(epoch, oldFd, newFd, time))
+      case _ => None
+    }
+  }
+
   case class Open(epoch: String, file: String, status: Int, time: String) extends LogEntry {
     def fd = status.toString
   }

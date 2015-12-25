@@ -70,6 +70,12 @@ abstract class Analysis {
         fdDB += (dup.newFd -> file)
         dup
 
+      case LogEntry.Dup2(dup2) if dup2.status >= 0 =>
+        val where = fdDB get dup2.oldFd
+        val file = where.fold("no entry for dup2 found, probably PIPE")(identity)
+        fdDB += (dup2.newFd -> file)
+        dup2
+
       case LogEntry.Open(open) if open.status >= 0 =>
         fdDB += (open.fd -> open.file)
         open
