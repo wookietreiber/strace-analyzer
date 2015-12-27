@@ -47,10 +47,7 @@ trait HasFileOpSummary {
   object FileOpSummary {
     val empty = FileOpSummary(bytes = 0L, ops = 0L, seconds = 0.0)
 
-    def apply(read: LogEntry.Read): FileOpSummary =
-      FileOpSummary(bytes = read.bytes, ops = 1, seconds = read.time.toDouble)
-
-    def apply(write: LogEntry.Write): FileOpSummary =
-      FileOpSummary(bytes = write.bytes, ops = 1, seconds = write.time.toDouble)
+    def apply(entry: LogEntry with HasBytes): FileOpSummary =
+      FileOpSummary(bytes = entry.bytes, ops = 1, seconds = entry.time.toDouble)
   }
 }

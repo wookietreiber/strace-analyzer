@@ -26,32 +26,17 @@ package strace
 package analyze
 
 trait PerFileSummary extends HasFileOpSummary {
-  def readAnalysis(entries: List[LogEntry])(implicit config: Config): Unit = {
-    val reads = entries collect {
-      case entry: LogEntry.Read => entry
-    }
+  def analysis(entries: List[LogEntry], op: String)
+    (pf: PartialFunction[LogEntry,LogEntry with HasBytes with HasFD]): Unit = {
 
-    val analysis = reads.groupBy(_.fd) mapValues { entries =>
+    val filtered = entries.collect(pf)
+
+    val analysis = filtered.groupBy(_.fd) mapValues { entries =>
       entries.foldLeft(FileOpSummary.empty)(_ + FileOpSummary(_))
     }
 
     for ((file,analysis) <- analysis) {
-      val output = analysis.humanized(op = "read")
-      println(s"""$output $file""")
-    }
-  }
-
-  def writeAnalysis(entries: List[LogEntry])(implicit config: Config): Unit = {
-    val writes = entries collect {
-      case entry: LogEntry.Write => entry
-    }
-
-    val analysis = writes.groupBy(_.fd) mapValues { entries =>
-      entries.foldLeft(FileOpSummary.empty)(_ + FileOpSummary(_))
-    }
-
-    for ((file,analysis) <- analysis) {
-      val output = analysis.humanized(op = "write")
+      val output = analysis.humanized(op)
       println(s"""$output $file""")
     }
   }
@@ -60,21 +45,21 @@ trait PerFileSummary extends HasFileOpSummary {
 object IO extends Analysis with PerFileSummary {
   def analyze(implicit config: Config): Unit =
     for ((_,entries) <- parseLogs) {
-      readAnalysis(entries)
-      writeAnalysis(entries)
+      analysis(entries, op = "read") { case entry: LogEntry.Read => entry }
+      analysis(entries, op = "write") { case entry: LogEntry.Write => entry }
     }
 }
 
 object Read extends Analysis with PerFileSummary {
   def analyze(implicit config: Config): Unit =
     for ((_,entries) <- parseLogs) {
-      readAnalysis(entries)
+      analysis(entries, op = "read") { case entry: LogEntry.Read => entry }
     }
 }
 
 object Write extends Analysis with PerFileSummary {
   def analyze(implicit config: Config): Unit =
     for ((_,entries) <- parseLogs) {
-      writeAnalysis(entries)
+      analysis(entries, op = "write") { case entry: LogEntry.Write => entry }
     }
 }
