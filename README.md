@@ -12,6 +12,21 @@ File descriptors are associated with file names. The association is made when sy
 **open**, **creat**, **dup** or **pipe** are read from the log and the association gets terminated
 when they get **close**d.
 
+building
+--------
+
+build dependencies:
+
+- [jdk][]
+- [sbt][]
+
+```bash
+git clone https://github.com/wookietreiber/strace-analyzer.git
+cd strace-analyzer
+sbt stage
+export $PATH="$PWD/target/universal/stage/bin:$PATH"
+```
+
 usage
 -----
 
@@ -75,9 +90,11 @@ any of the following:
         strace-analyzer read strace.log.27049 | column -t
 
 [awk]: http://man7.org/linux/man-pages/man1/gawk.1.html "gawk man page"
-[uucaletter]: http://porkmail.org/era/unix/award.html#uucaletter "useless use of cat award form letter"
-[grep]: http://man7.org/linux/man-pages/man1/grep.1.html "grep man page"
 [column]: http://man7.org/linux/man-pages/man1/column.1.html "column man page"
+[grep]: http://man7.org/linux/man-pages/man1/grep.1.html "grep man page"
+[jdk]: https://en.wikipedia.org/wiki/Java_Development_Kit "Java Development Kit"
 [newissue]: https://github.com/wookietreiber/strace-analyzer/issues/new "open new issue"
+[sbt]: http://www.scala-sbt.org/ "sbt"
 [sort]: http://man7.org/linux/man-pages/man1/sort.1.html "sort man page"
 [strace]: http://sourceforge.net/projects/strace/ "strace home page"
+[uucaletter]: http://porkmail.org/era/unix/award.html#uucaletter "useless use of cat award form letter"
