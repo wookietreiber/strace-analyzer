@@ -36,6 +36,7 @@ trait HasBytes {
   self: LogEntry =>
 
   def bytes: Long
+  def reqbytes: Long
 }
 
 trait HasFD {
@@ -136,30 +137,30 @@ object LogEntry {
     }
   }
 
-  case class Read(epoch: String, fd: String, bytes: Long, time: String)
+  case class Read(epoch: String, fd: String, reqbytes: Long, bytes: Long, time: String)
       extends LogEntry with HasBytes with HasFD {
     def status = bytes.toInt
   }
 
   object Read {
-    val regex = """(\d+\.\d+) read\((\d+), .+\)\s+= (\d+) <(\d+\.\d+)>""".r
+    val regex = """(\d+\.\d+) read\((\d+),.*, (\d+)\)\s+= (\d+) <(\d+\.\d+)>""".r
     def unapply(line: String): Option[Read] = line match {
-      case regex(epoch, fd, bytes, time) =>
-        Some(new Read(epoch, fd, bytes.toLong, time))
+      case regex(epoch, fd, reqbytes, bytes, time) =>
+        Some(new Read(epoch, fd, reqbytes.toLong, bytes.toLong, time))
       case _ => None
     }
   }
 
-  case class Write(epoch: String, fd: String, bytes: Long, time: String)
+  case class Write(epoch: String, fd: String, reqbytes: Long, bytes: Long, time: String)
       extends LogEntry with HasBytes with HasFD {
     def status = bytes.toInt
   }
 
   object Write {
-    val regex = """(\d+\.\d+) write\((\d+), .+\)\s+= (\d+) <(\d+\.\d+)>""".r
+    val regex = """(\d+\.\d+) write\((\d+),.*,(\d+)\)\s+= (\d+) <(\d+\.\d+)>""".r
     def unapply(line: String): Option[Write] = line match {
-      case regex(epoch, fd, bytes, time) =>
-        Some(new Write(epoch, fd, bytes.toLong, time))
+      case regex(epoch, fd, reqbytes, bytes, time) =>
+        Some(new Write(epoch, fd, reqbytes.toLong, bytes.toLong, time))
       case _ => None
     }
   }
