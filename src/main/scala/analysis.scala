@@ -25,10 +25,14 @@
 package strace
 package analyze
 
+import java.io._
+
 /**
   * @todo scalaz-stream / fs2
   */
 abstract class Analysis {
+
+  val bufSize = math.pow(2,20).toInt
 
   /** Analyzes strace logs and prints the result to STDOUT. */
   def analyze(implicit config: Config): Unit
@@ -40,7 +44,7 @@ abstract class Analysis {
     else {
       val xs = for {
         log <- config.logs.distinct.toIterator
-        source = io.Source.fromFile(log)
+        source = io.Source.fromInputStream(new BufferedInputStream(new FileInputStream(log), bufSize))
         entries = parseLog(source)
       } yield log.getName -> entries
 
@@ -91,9 +95,11 @@ abstract class Analysis {
         fdDB += (pipe.write -> "PIPE")
         pipe
 
+        // TODO ignore exit status 0?
       case LogEntry.Read(read) if read.status >= 0 =>
         fdDB.get(read.fd).fold(read)(file => read.copy(fd = file))
 
+        // TODO ignore exit status 0?
       case LogEntry.Write(write) if write.status >= 0 =>
         fdDB.get(write.fd).fold(write)(file => write.copy(fd = file))
     }).toList
