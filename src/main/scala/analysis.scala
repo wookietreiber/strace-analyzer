@@ -34,17 +34,17 @@ abstract class Analysis {
   def analyze(implicit config: Config): Unit
 
   /** Returns the log entries grouped by log input. */
-  def parseLogs(implicit config: Config): Map[String,List[LogEntry]] =
+  def parseLogs(implicit config: Config): Iterator[(String,List[LogEntry])] =
     if (config.logs.isEmpty)
-      Map("STDIN" -> parseLog(io.Source.stdin))
+      Iterator("STDIN" -> parseLog(io.Source.stdin))
     else {
       val xs = for {
-        log <- config.logs.distinct
+        log <- config.logs.distinct.toIterator
         source = io.Source.fromFile(log)
         entries = parseLog(source)
       } yield log.getName -> entries
 
-      xs.toMap
+      xs
     }
 
   /** Returns a parsed strace log. */
