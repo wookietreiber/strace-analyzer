@@ -3,7 +3,7 @@ strace-analyzer
 
 Analyzes [strace][] output. Currently, the following analysis commands are provided:
 
-- **summary** (default) short summary
+- **summary** short summary
 - **read** per file read summary
 - **write** per file write summary
 - **io** does both **read** and **write**
@@ -32,16 +32,16 @@ usage
 
 ```bash
 # create logs
-strace -T -ttt -ff -o strace.log app
+strace -T -ttt -ff -o app-strace.log app
 
 # analyze logs (command defines how they are analyzed)
-strace-analyzer command strace.log.4242 strace.log.4243
+strace-analyzer command app-strace.log.*
 
 # pipelining, ignore the useless use of cat, this is just an example ;-)
-cat strace.log.27049 | strace-analyzer read | column -t
+cat app-strace.log.27049 | strace-analyzer read | column -t
 ```
 
-More help can be found here:
+More help can be gotten via:
 
 ```bash
 strace-analyzer --help
