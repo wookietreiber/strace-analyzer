@@ -157,7 +157,7 @@ object LogEntry {
   }
 
   object Write {
-    val regex = """(\d+\.\d+) write\((\d+),.*,(\d+)\)\s+= (\d+) <(\d+\.\d+)>""".r
+    val regex = """(\d+\.\d+) write\((\d+),.*, (\d+)\)\s+= (\d+) <(\d+\.\d+)>""".r
     def unapply(line: String): Option[Write] = line match {
       case regex(epoch, fd, reqbytes, bytes, time) =>
         Some(new Write(epoch, fd, reqbytes.toLong, bytes.toLong, time))
