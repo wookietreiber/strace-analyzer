@@ -1,6 +1,6 @@
 enablePlugins(GitVersioning)
 enablePlugins(JavaAppPackaging)
-enablePlugins(LinuxPlugin)
+enablePlugins(UniversalPlugin)
 
 organization in ThisBuild := "com.github.wookietreiber"
 
@@ -13,5 +13,13 @@ lazy val root = (project in file(".")).
   settings (
     name := "strace-analyzer",
     buildInfoKeys := Seq[BuildInfoKey](name, version),
-    buildInfoPackage := "strace.analyze"
+    buildInfoPackage := "strace.analyze",
+    mappings in Universal <++= name in Universal map { name =>
+      val license = file("LICENSE")
+      val notice = file("NOTICE.md")
+      Seq (
+        license -> ("share/" + name + "/LICENSE"),
+        notice -> ("share/" + name + "/NOTICE.md")
+      )
+    }
   )
