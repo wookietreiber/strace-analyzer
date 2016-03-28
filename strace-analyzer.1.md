@@ -32,6 +32,10 @@ resulting **strace(1)** invocation to create the logs should look as in the **EX
 
 ## Analysis Commands
 
+help
+
+:   Prints usage information.
+
 summary
 
 :   Prints a summary for the syscalls **read(2)** and **write(2)**.

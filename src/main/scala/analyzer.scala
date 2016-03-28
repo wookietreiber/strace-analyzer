@@ -33,40 +33,19 @@ object Analyzer extends App {
   // help / usage / version
   // -----------------------------------------------------------------------------------------------
 
+  def help() = {
+    import sys.process._
+    "man strace-analyzer".!
+    sys exit 0
+  }
+
   if (List("-version", "--version") exists args.contains) {
     Console.println(s"""${BuildInfo.name} ${BuildInfo.version}""")
     sys exit 0
   }
 
-  if (List("-?", "-h", "-help", "--help") exists args.contains) {
-    Console.println(s"""
-      |${BuildInfo.name} ${BuildInfo.version}
-      |
-      |Usage: strace-analyzer [io|read|summary|write] [<log1> <log2> ...]
-      |
-      |Generate logs like this:
-      |
-      |  strace -ff -T -ttt -o app-strace.log app
-      |
-      |Other formats are not supported.
-      |
-      |  -? | -h | -help | --help            print this help
-      |  -version | --version                print version
-      |
-      |Command: io
-      |  The io command compiles a read/write operation summary.
-      |
-      |Command: read
-      |  The read command compiles a read operation summary.
-      |
-      |Command: summary
-      |  The summary command compiles a short per operation summary.
-      |
-      |Command: write
-      |  The write command compiles a write operation summary.
-      |""".stripMargin)
-    sys exit 0
-  }
+  if (List("-?", "-h", "-help", "--help") exists args.contains)
+    help()
 
   // -----------------------------------------------------------------------------------------------
   // parse cli args
@@ -81,6 +60,9 @@ object Analyzer extends App {
     case Some("read")    => Read
     case Some("summary") => Summary
     case Some("write")   => Write
+
+    case Some("help") =>
+      help()
 
     case Some(other) =>
       Console.err.println(s"""error: don't know the command "$other"""")
