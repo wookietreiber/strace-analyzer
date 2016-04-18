@@ -52,6 +52,10 @@ io
 
 :   Does both the **read** and **write** commands for each file.
 
+io-profile
+
+:   Per file **read** and **write** profile. Outputs a chart (png) per file and per operation.
+
 # OPTIONS
 
 -?, -h, -help, --help

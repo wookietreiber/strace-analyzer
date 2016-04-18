@@ -7,6 +7,7 @@ Analyzes [strace][] output. Currently, the following analysis commands are provi
 - **read** per file read summary
 - **write** per file write summary
 - **io** does both **read** and **write**
+- **io-profile** per file **read** and **write** profile, outputs a chart (png) per file and per op
 
 File descriptors are associated with file names. The association is made when syscalls like
 **open**, **creat**, **dup** or **pipe** are read from the log and the association gets terminated

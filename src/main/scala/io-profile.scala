@@ -2,7 +2,7 @@
  *                                                                                               *
  *  Copyright  (C)  2015-2016  Christian Krause                                                  *
  *                                                                                               *
- *  Christian Krause  <christian.krause@mailbox.org>                                             *
+ *  Christian Krause  <kizkizzbangbang@gmail.com>                                                *
  *                                                                                               *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                                                                                               *
@@ -25,70 +25,66 @@
 package strace
 package analyze
 
-import java.io.File
+import scalax.chart.api._
 
-object Analyzer extends App {
-
-  // -----------------------------------------------------------------------------------------------
-  // help / usage / version
-  // -----------------------------------------------------------------------------------------------
-
-  def help() = {
-    import sys.process._
-    "man strace-analyzer".!
-    sys exit 0
-  }
-
-  if (List("-version", "--version") exists args.contains) {
-    Console.println(s"""${BuildInfo.name} ${BuildInfo.version}""")
-    sys exit 0
-  }
-
-  if (List("-?", "-h", "-help", "--help") exists args.contains)
-    help()
-
-  // -----------------------------------------------------------------------------------------------
-  // parse cli args
-  // -----------------------------------------------------------------------------------------------
-
-  val command = args.headOption match {
-    case None =>
-      Console.err.println("error: need command")
-      sys exit 1
-
-    case Some("io")         => IO
-    case Some("io-profile") => IOProfile
-    case Some("read")       => Read
-    case Some("summary")    => Summary
-    case Some("write")      => Write
-
-    case Some("help") =>
-      help()
-
-    case Some(other) =>
-      Console.err.println(s"""error: don't know the command "$other"""")
-      sys exit 1
-  }
-
-  def accumulate(conf: Config)(args: List[String]): Config = args match {
-    case Nil =>
-      conf.copy(logs = conf.logs.reverse)
-
-    case x :: tail =>
-      val file = new File(x)
-      if (!file.exists) {
-        Console.err.println(s"""error: file "$x" does not exist""")
-        sys exit 1
+object IOProfile extends Analysis {
+  def analyze(implicit config: Config): Unit =
+    for ((log,entries) <- parseLogs) {
+      saveChart(log, entries, op = "read") {
+        case entry: LogEntry.Read => entry
       }
-      accumulate(conf.copy(logs = file :: conf.logs))(tail)
+
+      saveChart(log, entries, op = "write") {
+        case entry: LogEntry.Write => entry
+      }
+    }
+
+  def saveChart(log: String, entries: List[LogEntry], op: String)
+    (pf: PartialFunction[LogEntry,LogEntry with HasBytes with HasFD]): Unit = {
+    val filtered = entries.collect(pf)
+
+    for ((file,entries) <- filtered.groupBy(_.fd)) {
+      val filename = new java.io.File(file).getName
+      val logname = new java.io.File(log).getName
+
+      val chart = genChart(entries)
+
+      chart.saveAsPNG (
+        file = s"""strace-analyzer-profile-$op-$logname-$filename.png""",
+        resolution = (1920,1080)
+      )
+    }
   }
 
-  val conf = accumulate(Config())(args.toList.tail)
+  def genChart[A <: LogEntry with HasBytes](entries: List[A]) = {
+    import java.text._
+    import java.util.Date
+    import org.jfree.chart.axis.NumberAxis
+    import org.jfree.data.time.Second
 
-  // -----------------------------------------------------------------------------------------------
-  // analyze
-  // -----------------------------------------------------------------------------------------------
+    val raw = for {
+      entry <- entries
+      time = new Second(new Date(entry.jepoch))
+      value = entry.bytes
+    } yield (time,value)
 
-  command.analyze(conf)
+    val data = raw.groupBy(_._1).mapValues(_.foldLeft(0L)(_ + _._2))
 
+    val chart = XYBarChart(data.toTimeSeries(""), legend = false)
+    chart.plot.range.axis.label.text = "bytes"
+    chart.plot.range.axis.peer match {
+      case axis: NumberAxis =>
+        axis setNumberFormatOverride new NumberFormat {
+          def format(value: Long, buf: StringBuffer, fp: FieldPosition): StringBuffer =
+            buf append Memory.humanize(value)
+          def format(value: Double, buf: StringBuffer, fp: FieldPosition): StringBuffer =
+            format(value.round, buf, fp)
+          def parse(value: String, pp: ParsePosition): Number = ???
+        }
+
+      case _ =>
+    }
+
+    chart
+  }
 }
