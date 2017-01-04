@@ -70,7 +70,8 @@ object IOProfile extends Analysis {
 
     val data = raw.groupBy(_._1).mapValues(_.foldLeft(0L)(_ + _._2))
 
-    val chart = XYBarChart(data.toTimeSeries(""), legend = false)
+    val chart = XYBarChart(data.toTimeSeries(""))
+    chart.subtitles.clear()
     chart.plot.range.axis.label.text = "bytes"
     chart.plot.range.axis.peer match {
       case axis: NumberAxis =>
