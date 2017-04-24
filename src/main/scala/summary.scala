@@ -28,8 +28,15 @@ package analyze
 object Summary extends Analysis with HasFileOpSummary {
   def analyze(implicit config: Config): Unit =
     for ((log,entries) <- parseLogs) {
-      printSummary(log, entries, "read") { case entry: LogEntry.Read => entry }
-      printSummary(log, entries, "write") { case entry: LogEntry.Write => entry }
+      printSummary(log, entries, "read") {
+        case entry: LogEntry.PRead => entry
+        case entry: LogEntry.Read => entry
+      }
+
+      printSummary(log, entries, "write") {
+        case entry: LogEntry.PWrite => entry
+        case entry: LogEntry.Write => entry
+      }
     }
 
   def printSummary(log: String, entries: List[LogEntry], op: String)
