@@ -137,6 +137,34 @@ object LogEntry {
     }
   }
 
+  case class PRead(epoch: String, fd: String, reqbytes: Long, bytes: Long, time: String)
+      extends LogEntry with HasBytes with HasFD {
+    def status = bytes.toInt
+  }
+
+  object PRead {
+    val regex = """(\d+\.\d+) pread\((\d+),.*, (\d+), \d+\)\s+= (\d+) <(\d+\.\d+)>""".r
+    def unapply(line: String): Option[PRead] = line match {
+      case regex(epoch, fd, reqbytes, bytes, time) =>
+        Some(new PRead(epoch, fd, reqbytes.toLong, bytes.toLong, time))
+      case _ => None
+    }
+  }
+
+  case class PWrite(epoch: String, fd: String, reqbytes: Long, bytes: Long, time: String)
+      extends LogEntry with HasBytes with HasFD {
+    def status = bytes.toInt
+  }
+
+  object PWrite {
+    val regex = """(\d+\.\d+) pwrite\((\d+),.*, (\d+), \d+\)\s+= (\d+) <(\d+\.\d+)>""".r
+    def unapply(line: String): Option[PWrite] = line match {
+      case regex(epoch, fd, reqbytes, bytes, time) =>
+        Some(new PWrite(epoch, fd, reqbytes.toLong, bytes.toLong, time))
+      case _ => None
+    }
+  }
+
   case class Read(epoch: String, fd: String, reqbytes: Long, bytes: Long, time: String)
       extends LogEntry with HasBytes with HasFD {
     def status = bytes.toInt

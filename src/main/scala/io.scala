@@ -45,21 +45,34 @@ trait PerFileSummary extends HasFileOpSummary {
 object IO extends Analysis with PerFileSummary {
   def analyze(implicit config: Config): Unit =
     for ((_,entries) <- parseLogs) {
-      analysis(entries, op = "read") { case entry: LogEntry.Read => entry }
-      analysis(entries, op = "write") { case entry: LogEntry.Write => entry }
+      analysis(entries, op = "read") {
+        case entry: LogEntry.PRead => entry
+        case entry: LogEntry.Read => entry
+      }
+
+      analysis(entries, op = "write") {
+        case entry: LogEntry.PWrite => entry
+        case entry: LogEntry.Write => entry
+      }
     }
 }
 
 object Read extends Analysis with PerFileSummary {
   def analyze(implicit config: Config): Unit =
     for ((_,entries) <- parseLogs) {
-      analysis(entries, op = "read") { case entry: LogEntry.Read => entry }
+      analysis(entries, op = "read") {
+        case entry: LogEntry.PRead => entry
+        case entry: LogEntry.Read => entry
+      }
     }
 }
 
 object Write extends Analysis with PerFileSummary {
   def analyze(implicit config: Config): Unit =
     for ((_,entries) <- parseLogs) {
-      analysis(entries, op = "write") { case entry: LogEntry.Write => entry }
+      analysis(entries, op = "write") {
+        case entry: LogEntry.PWrite => entry
+        case entry: LogEntry.Write => entry
+      }
     }
 }

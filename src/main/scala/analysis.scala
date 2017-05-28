@@ -96,6 +96,14 @@ abstract class Analysis {
         pipe
 
         // TODO ignore exit status 0?
+      case LogEntry.PRead(pread) if pread.status >= 0 =>
+        fdDB.get(pread.fd).fold(pread)(file => pread.copy(fd = file))
+
+        // TODO ignore exit status 0?
+      case LogEntry.PWrite(pwrite) if pwrite.status >= 0 =>
+        fdDB.get(pwrite.fd).fold(pwrite)(file => pwrite.copy(fd = file))
+
+        // TODO ignore exit status 0?
       case LogEntry.Read(read) if read.status >= 0 =>
         fdDB.get(read.fd).fold(read)(file => read.copy(fd = file))
 

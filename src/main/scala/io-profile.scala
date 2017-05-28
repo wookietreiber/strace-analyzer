@@ -31,10 +31,12 @@ object IOProfile extends Analysis {
   def analyze(implicit config: Config): Unit =
     for ((log,entries) <- parseLogs) {
       saveChart(log, entries, op = "read") {
+        case entry: LogEntry.PRead => entry
         case entry: LogEntry.Read => entry
       }
 
       saveChart(log, entries, op = "write") {
+        case entry: LogEntry.PWrite => entry
         case entry: LogEntry.Write => entry
       }
     }
