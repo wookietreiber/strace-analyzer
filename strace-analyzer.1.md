@@ -1,4 +1,4 @@
-% STRACE-ANALYZER(1) Version 0.2.0 | strace-analyzer manual
+% STRACE-ANALYZER(1) Version 0.2.1 | strace-analyzer manual
 %
 % March 2016
 
