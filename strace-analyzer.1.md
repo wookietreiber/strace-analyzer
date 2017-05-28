@@ -1,4 +1,4 @@
-% STRACE-ANALYZER(1) Version 0.1.1 | strace-analyzer manual
+% STRACE-ANALYZER(1) Version 0.2.0 | strace-analyzer manual
 %
 % March 2016
 
@@ -32,6 +32,10 @@ resulting **strace(1)** invocation to create the logs should look as in the **EX
 
 ## Analysis Commands
 
+help
+
+:   Prints usage information.
+
 summary
 
 :   Prints a summary for the syscalls **read(2)** and **write(2)**.
@@ -47,6 +51,10 @@ write
 io
 
 :   Does both the **read** and **write** commands for each file.
+
+io-profile
+
+:   Per file **read** and **write** profile. Outputs a chart (png) per file and per operation.
 
 # OPTIONS
 

@@ -10,6 +10,7 @@ lazy val root = (project in file(".")).
   enablePlugins(BuildInfoPlugin).
   settings (
     name := "strace-analyzer",
+    libraryDependencies += "com.github.wookietreiber" %% "scala-chart" % "0.5.0",
     buildInfoKeys := Seq[BuildInfoKey](name, version),
     buildInfoPackage := "strace.analyze",
     mappings in Universal <++= name in Universal map { name =>

@@ -22,7 +22,7 @@ _strace-analyzer()
             COMPREPLY=( $( compgen -W '-? -h -help -version --help --version' -- $cur ) )
             ;;
         *)
-            COMPREPLY=( $( compgen -W 'summary read write io' -- $cur ) )
+            COMPREPLY=( $( compgen -W 'summary read write io io-profile' -- $cur ) )
             ;;
     esac
 
