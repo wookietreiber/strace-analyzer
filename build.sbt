@@ -12,7 +12,6 @@ lazy val root = (project in file(".")).
   enablePlugins(BuildInfoPlugin).
   settings (
     name := "strace-analyzer",
-    libraryDependencies += "com.github.scopt" %% "scopt" % "3.3.0",
     buildInfoKeys := Seq[BuildInfoKey](name, version),
     buildInfoPackage := "strace.analyze"
   )
