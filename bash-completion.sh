@@ -6,7 +6,7 @@ _strace-analyzer()
     _init_completion || return
 
     case $prev in
-        summary|read|write|io)
+        summary|read|write|io|io-profile)
             _expand || return 0
             compopt -o filenames
             COMPREPLY=( $( compgen -fd -- "$cur" ) )
