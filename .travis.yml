@@ -1,0 +1,21 @@
+sudo: false
+
+os: linux
+dist: trusty
+
+language: rust
+
+rust:
+  - stable
+  - beta
+  - nightly
+
+matrix:
+  allow_failures:
+    - rust: nightly
+
+cache: cargo
+
+env:
+  global:
+    - CARGO_BUILD_JOBS="2"

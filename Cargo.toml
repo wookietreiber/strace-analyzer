@@ -1,0 +1,18 @@
+[package]
+name = "strace-analyzer"
+version = "0.3.0"
+authors = ["Christian Krause <christian.krause@mailbox.org>"]
+description = "analyze strace output"
+license = "GPL-3.0-or-later"
+readme = "README.md"
+documentation = "https://github.com/wookietreiber/strace-analyzer"
+homepage = "https://github.com/wookietreiber/strace-analyzer"
+repository = "https://github.com/wookietreiber/strace-analyzer"
+keywords = ["strace"]
+categories = ["command-line-utilities"]
+
+[dependencies]
+bytesize = "^1"
+clap = "^2"
+lazy_static = "^1"
+regex = "^1"
