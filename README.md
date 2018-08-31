@@ -3,8 +3,6 @@ strace analyzer
 
 Analyzes [strace][] output.
 
-Pre-built packages can be downloaded from the [GitHub releases page][releases].
-
 
 building
 --------
@@ -92,7 +90,7 @@ strace-analyzer will **not** do any of the following:
 [awk]: http://man7.org/linux/man-pages/man1/gawk.1.html "gawk man page"
 [column]: http://man7.org/linux/man-pages/man1/column.1.html "column man page"
 [grep]: http://man7.org/linux/man-pages/man1/grep.1.html "grep man page"
-[releases]: https://github.com/wookietreiber/strace-analyzer/releases "pre-built strace-analyzer releases"
+[newissue]: https://github.com/wookietreiber/strace-analyzer/issues "issue tracker"
 [rust]: https://www.rust-lang.org/ "rust programming language home page"
 [sort]: http://man7.org/linux/man-pages/man1/sort.1.html "sort man page"
 [strace]: http://sourceforge.net/projects/strace/ "strace home page"
