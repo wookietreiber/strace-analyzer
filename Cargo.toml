@@ -12,6 +12,7 @@ keywords = ["strace"]
 categories = ["command-line-utilities"]
 
 [dependencies]
+atty = "^0.2"
 bytesize = "^1"
 clap = "^2"
 lazy_static = "^1"

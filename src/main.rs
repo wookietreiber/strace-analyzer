@@ -33,6 +33,7 @@ use analysis::analyze;
 use config::Config;
 use summary::Summary;
 
+extern crate atty;
 extern crate bytesize;
 #[macro_use]
 extern crate clap;
@@ -40,14 +41,22 @@ extern crate clap;
 extern crate lazy_static;
 extern crate regex;
 
-use clap::{Arg, App};
+use atty::Stream;
+use clap::{App, AppSettings, Arg};
 use std::collections::HashMap;
 use std::io;
 use std::path::Path;
 
 fn main() -> io::Result<()> {
+    let color = if atty::is(Stream::Stdout) {
+        AppSettings::ColoredHelp
+    } else {
+        AppSettings::ColorNever
+    };
+
     let matches = App::new("strace-analyzer")
         .version(crate_version!())
+        .global_setting(color)
         .about("analyze strace output")
         .arg(Arg::with_name("file")
              .help("strace log")
