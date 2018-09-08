@@ -77,11 +77,18 @@ impl Summary {
 
     pub fn show(&self, config: &Config) {
         if !config.verbose &&
-            (self.file == "/dev/null" ||
-             self.file.starts_with("/etc") ||
-             self.file.starts_with("/lib") ||
-             self.file.starts_with("/proc") ||
-             self.file.starts_with("/usr") ||
+            (self.file.starts_with("/bin/") ||
+             self.file == "/dev/null" ||
+             self.file.starts_with("/etc/") ||
+             self.file.starts_with("/lib/") ||
+             self.file.starts_with("/lib64/") ||
+             self.file.starts_with("/opt/") ||
+             self.file.starts_with("/proc/") ||
+             self.file.starts_with("/run/") ||
+             self.file.starts_with("/sbin/") ||
+             self.file.starts_with("/sys/") ||
+             self.file.starts_with("/tmp/") ||
+             self.file.starts_with("/usr/") ||
              self.file == "STDOUT" ||
              self.file == "STDERR" ||
              self.file == "STDIN" ||
