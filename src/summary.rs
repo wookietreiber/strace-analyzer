@@ -28,13 +28,14 @@ use config::Config;
 use log::*;
 
 use bytesize::ByteSize;
+use std::collections::HashMap;
 
 #[derive(Clone)]
 #[derive(Debug)]
 pub struct Summary {
     pub file: String,
-    read_ops: u64,
-    write_ops: u64,
+    read_freq: HashMap<u64, u64>,
+    write_freq: HashMap<u64, u64>,
     read_bytes: u64,
     write_bytes: u64,
 }
@@ -43,8 +44,8 @@ impl Summary {
     pub fn new(file: String) -> Summary {
         Summary {
             file,
-            read_ops: 0,
-            write_ops: 0,
+            read_freq: HashMap::new(),
+            write_freq: HashMap::new(),
             read_bytes: 0,
             write_bytes: 0,
         }
@@ -59,19 +60,21 @@ impl Summary {
     }
 
     pub fn reset(&mut self) {
-        self.read_ops = 0;
-        self.write_ops = 0;
+        self.read_freq.clear();
+        self.write_freq.clear();
         self.read_bytes = 0;
         self.write_bytes = 0;
     }
 
-    pub fn update_read(&mut self, bytes: u64) {
-        self.read_ops += 1;
+    pub fn update_read(&mut self, op_size: u64, bytes: u64) {
+        let freq = self.read_freq.entry(op_size).or_insert(0);
+        *freq += 1;
         self.read_bytes += bytes;
     }
 
-    pub fn update_write(&mut self, bytes: u64) {
-        self.write_ops += 1;
+    pub fn update_write(&mut self, op_size: u64, bytes: u64) {
+        let freq = self.write_freq.entry(op_size).or_insert(0);
+        *freq += 1;
         self.write_bytes += bytes;
     }
 
@@ -98,35 +101,33 @@ impl Summary {
                 return;
             }
 
-        if self.read_ops == 0 && self.write_ops == 0 {
+        if self.read_freq.is_empty() && self.write_freq.is_empty() {
             debug(format!("no I/O with {}", self.file), config);
             return;
         }
 
-        if self.read_ops > 0 {
-            let read = ByteSize(self.read_bytes).to_string_as(true);
-            let op_size = self.read_bytes / self.read_ops;
-            let mean = ByteSize(op_size).to_string_as(true);
+        if !self.read_freq.is_empty() {
+            let (op_size, _) = self.read_freq.iter().max().unwrap();
+            let n_ops: u64 = self.read_freq.values().sum();
 
             println!(
                 "read {} with {} ops ({} / op) {}",
-                read,
-                self.read_ops,
-                mean,
+                ByteSize(self.read_bytes).to_string_as(true),
+                n_ops,
+                ByteSize(*op_size).to_string_as(true),
                 self.file,
             );
         }
 
-        if self.write_ops > 0 {
-            let write = ByteSize(self.write_bytes).to_string_as(true);
-            let op_size = self.write_bytes / self.write_ops;
-            let mean = ByteSize(op_size).to_string_as(true);
+        if !self.write_freq.is_empty() {
+            let (op_size, _) = self.write_freq.iter().max().unwrap();
+            let n_ops: u64 = self.write_freq.values().sum();
 
             println!(
                 "write {} with {} ops ({} / op) {}",
-                write,
-                self.write_ops,
-                mean,
+                ByteSize(self.write_bytes).to_string_as(true),
+                n_ops,
+                ByteSize(*op_size).to_string_as(true),
                 self.file,
             );
         }

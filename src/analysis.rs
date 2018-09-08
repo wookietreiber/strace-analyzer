@@ -319,8 +319,9 @@ pub fn analyze(fds: &mut HashMap<u32, Summary>,
             let fd: u32 = cap[1].parse().unwrap();
 
             if let Some(summary) = fds.get_mut(&fd) {
-                let bytes: u64 = cap[2].parse().unwrap();
-                summary.update_read(bytes);
+                let opsize: u64 = cap[2].parse().unwrap();
+                let bytes: u64 = cap[3].parse().unwrap();
+                summary.update_read(opsize, bytes);
             } else {
                 verbose(format!("[pread] unknown fd {}", fd), config);
             }
@@ -330,8 +331,9 @@ pub fn analyze(fds: &mut HashMap<u32, Summary>,
             let fd: u32 = cap[1].parse().unwrap();
 
             if let Some(summary) = fds.get_mut(&fd) {
-                let bytes: u64 = cap[2].parse().unwrap();
-                summary.update_write(bytes);
+                let opsize: u64 = cap[2].parse().unwrap();
+                let bytes: u64 = cap[3].parse().unwrap();
+                summary.update_write(opsize, bytes);
             } else {
                 verbose(format!("[pwrite] unknown fd {}", fd), config);
             }
@@ -341,8 +343,9 @@ pub fn analyze(fds: &mut HashMap<u32, Summary>,
             let fd: u32 = cap[1].parse().unwrap();
 
             if let Some(summary) = fds.get_mut(&fd) {
-                let bytes: u64 = cap[2].parse().unwrap();
-                summary.update_read(bytes);
+                let opsize: u64 = cap[2].parse().unwrap();
+                let bytes: u64 = cap[3].parse().unwrap();
+                summary.update_read(opsize, bytes);
             } else {
                 verbose(format!("[read] unknown fd {}", fd), config);
             }
@@ -361,8 +364,9 @@ pub fn analyze(fds: &mut HashMap<u32, Summary>,
             let fd: u32 = cap[1].parse().unwrap();
 
             if let Some(summary) = fds.get_mut(&fd) {
-                let bytes: u64 = cap[2].parse().unwrap();
-                summary.update_write(bytes);
+                let opsize: u64 = cap[2].parse().unwrap();
+                let bytes: u64 = cap[3].parse().unwrap();
+                summary.update_write(opsize, bytes);
             } else {
                 verbose(format!("[write] unknown fd {}", fd), config);
             }
