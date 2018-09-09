@@ -112,9 +112,9 @@ impl Summary {
 
             println!(
                 "read {} with {} ops ({} / op) {}",
-                ByteSize(self.read_bytes).to_string_as(true),
+                humanize(self.read_bytes),
                 n_ops,
-                ByteSize(*op_size).to_string_as(true),
+                humanize(*op_size),
                 self.file,
             );
         }
@@ -125,11 +125,19 @@ impl Summary {
 
             println!(
                 "write {} with {} ops ({} / op) {}",
-                ByteSize(self.write_bytes).to_string_as(true),
+                humanize(self.write_bytes),
                 n_ops,
-                ByteSize(*op_size).to_string_as(true),
+                humanize(*op_size),
                 self.file,
             );
         }
     }
+}
+
+fn humanize(bytes: u64) -> String {
+    ByteSize(bytes)
+        .to_string_as(true)
+        .replace("iB", "")
+        .replace(" ", "")
+        .to_uppercase()
 }
