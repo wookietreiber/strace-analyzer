@@ -34,88 +34,6 @@ use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 use std::path::{Path, PathBuf};
 
-fn dup(fds: &mut HashMap<u32, Summary>,
-       syscall: &str,
-       oldfd: &u32,
-       newfd: u32,
-       config: &Config) {
-
-    let summary = if let Some(summary_old) = fds.get(&oldfd) {
-        let old_file = &summary_old.file;
-
-        debug(
-            format!("[{}] {} -> {} => {}", syscall, oldfd, &newfd, old_file),
-            config
-        );
-
-        Summary::new(old_file.clone())
-    } else {
-        debug(format!("[{}] couldn't find oldfd {}", syscall, oldfd), config);
-
-        Summary::new(String::from("DUP"))
-    };
-
-    insert(fds, newfd, summary, syscall, config);
-}
-
-fn finish(fds: &mut HashMap<u32, Summary>,
-          fd: u32,
-          syscall: &str,
-          config: &Config) {
-    if let Some(summary) = fds.remove(&fd) {
-        debug(
-            format!("[{}] {} => {}", syscall, fd, summary.file),
-            config
-        );
-
-        summary.show(config);
-    } else {
-        verbose(format!("[{}] unknown fd {}", syscall, fd), config);
-    }
-}
-
-fn insert(fds: &mut HashMap<u32, Summary>,
-          fd: u32,
-          summary: Summary,
-          syscall: &str,
-          config: &Config) {
-    if let Some(summary) = fds.insert(fd, summary) {
-        debug(format!(
-            "[{}] dropping {} without explicit close",
-            syscall, summary.file
-        ), config);
-
-        summary.show(config)
-    };
-}
-
-fn join_paths(fds: &HashMap<u32, Summary>,
-              dirfd: &str,
-              pathname: &str) -> String {
-    match dirfd {
-        "AT_FDCWD" => {
-            String::from(pathname)
-        },
-        fd_str => {
-            let dirfd: u32 = fd_str.parse().unwrap();
-
-            if let Some(dir_summary) = fds.get(&dirfd) {
-                let mut path = PathBuf::new();
-                path.push(dir_summary.file.clone());
-                path.push(pathname.clone());
-
-                if let Some(path) = path.to_str() {
-                    String::from(path)
-                } else {
-                    String::from(pathname)
-                }
-            } else {
-                String::from(pathname)
-            }
-        },
-    }
-}
-
 pub fn analyze(fds: &mut HashMap<u32, Summary>,
                input: &Path,
                config: &Config) -> io::Result<()> {
@@ -378,4 +296,90 @@ pub fn analyze(fds: &mut HashMap<u32, Summary>,
     }
 
     Ok(())
+}
+
+// ----------------------------------------------------------------------------
+// helpers
+// ----------------------------------------------------------------------------
+
+fn dup(fds: &mut HashMap<u32, Summary>,
+       syscall: &str,
+       oldfd: &u32,
+       newfd: u32,
+       config: &Config) {
+
+    let summary = if let Some(summary_old) = fds.get(&oldfd) {
+        let old_file = &summary_old.file;
+
+        debug(
+            format!("[{}] {} -> {} => {}", syscall, oldfd, &newfd, old_file),
+            config
+        );
+
+        Summary::new(old_file.clone())
+    } else {
+        debug(format!("[{}] couldn't find oldfd {}", syscall, oldfd), config);
+
+        Summary::new(String::from("DUP"))
+    };
+
+    insert(fds, newfd, summary, syscall, config);
+}
+
+fn finish(fds: &mut HashMap<u32, Summary>,
+          fd: u32,
+          syscall: &str,
+          config: &Config) {
+    if let Some(summary) = fds.remove(&fd) {
+        debug(
+            format!("[{}] {} => {}", syscall, fd, summary.file),
+            config
+        );
+
+        summary.show(config);
+    } else {
+        verbose(format!("[{}] unknown fd {}", syscall, fd), config);
+    }
+}
+
+fn insert(fds: &mut HashMap<u32, Summary>,
+          fd: u32,
+          summary: Summary,
+          syscall: &str,
+          config: &Config) {
+    if let Some(summary) = fds.insert(fd, summary) {
+        debug(format!(
+            "[{}] dropping {} without explicit close",
+            syscall, summary.file
+        ), config);
+
+        summary.show(config)
+    };
+}
+
+fn join_paths(fds: &HashMap<u32, Summary>,
+              dirfd: &str,
+              pathname: &str) -> String {
+    match dirfd {
+        "AT_FDCWD" => {
+            String::from(pathname)
+        },
+        fd_str => {
+            let dirfd: u32 = fd_str.parse().unwrap();
+
+            if let Some(dir_summary) = fds.get(&dirfd) {
+                let mut path = PathBuf::new();
+                path.push(dir_summary.file.clone());
+                path.push(pathname.clone());
+
+                if let Some(path) = path.to_str() {
+                    String::from(path)
+                } else {
+                    String::from(pathname)
+                }
+            } else {
+                String::from(pathname)
+            }
+        },
+    }
 }
