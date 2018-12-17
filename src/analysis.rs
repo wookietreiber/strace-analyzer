@@ -37,9 +37,9 @@ use std::path::{Path, PathBuf};
 pub fn run(input: String, config: Config) -> io::Result<()> {
     let input = Path::new(&input);
 
-    let stdin = Summary::new(String::from("STDIN"));
-    let stdout = Summary::new(String::from("STDOUT"));
-    let stderr = Summary::new(String::from("STDERR"));
+    let stdin = Summary::new("STDIN");
+    let stdout = Summary::new("STDOUT");
+    let stderr = Summary::new("STDERR");
 
     let mut fds: HashMap<u32, Summary> = HashMap::new();
 
@@ -144,7 +144,7 @@ fn analyze(fds: &mut HashMap<u32, Summary>,
         let line = l?;
 
         for cap in RE_CREAT.captures_iter(&line) {
-            let file = String::from(&cap[1]);
+            let file = &cap[1];
             let fd: u32 = cap[2].parse().unwrap();
 
             debug(format!("[creat] {} => {}", fd, file), config);
@@ -216,7 +216,7 @@ fn analyze(fds: &mut HashMap<u32, Summary>,
         }
 
         for cap in RE_OPEN.captures_iter(&line) {
-            let file = String::from(&cap[1]);
+            let file = &cap[1];
             let fd: u32 = cap[2].parse().unwrap();
 
             debug(format!("[open] {} => {}", fd, file), config);
@@ -235,7 +235,7 @@ fn analyze(fds: &mut HashMap<u32, Summary>,
             debug(format!("[openat] {} => {}", fd, file), config);
 
             let syscall = "openat";
-            insert(fds, fd, Summary::new(file), syscall, config);
+            insert(fds, fd, Summary::new(&file), syscall, config);
         }
 
         for cap in RE_PIPE.captures_iter(&line) {
@@ -332,11 +332,11 @@ fn dup(fds: &mut HashMap<u32, Summary>,
             config
         );
 
-        Summary::new(old_file.clone())
+        Summary::new(old_file)
     } else {
         debug(format!("[{}] couldn't find oldfd {}", syscall, oldfd), config);
 
-        Summary::new(String::from("DUP"))
+        Summary::new("DUP")
     };
 
     insert(fds, newfd, summary, syscall, config);

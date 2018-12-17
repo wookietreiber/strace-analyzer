@@ -41,9 +41,9 @@ pub struct Summary {
 }
 
 impl Summary {
-    pub fn new(file: String) -> Summary {
+    pub fn new(file: &str) -> Summary {
         Summary {
-            file,
+            file: String::from(file),
             read_freq: HashMap::new(),
             write_freq: HashMap::new(),
             read_bytes: 0,
@@ -52,11 +52,11 @@ impl Summary {
     }
 
     pub fn pipe() -> Summary {
-        Summary::new(String::from("PIPE"))
+        Summary::new("PIPE")
     }
 
     pub fn socket() -> Summary {
-        Summary::new(String::from("SOCKET"))
+        Summary::new("SOCKET")
     }
 
     pub fn reset(&mut self) {
