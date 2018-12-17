@@ -24,15 +24,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-mod analysis;
-mod config;
-mod log;
-mod summary;
-
-use analysis::analyze;
-use config::Config;
-use summary::Summary;
-
 extern crate atty;
 extern crate bytesize;
 #[macro_use]
@@ -41,48 +32,23 @@ extern crate clap;
 extern crate lazy_static;
 extern crate regex;
 
-use atty::Stream;
-use clap::{App, AppSettings, Arg};
+mod app;
+mod analysis;
+mod config;
+mod log;
+mod summary;
+
+use analysis::analyze;
+use summary::Summary;
+
 use std::collections::HashMap;
 use std::io;
 use std::path::Path;
 
 fn main() -> io::Result<()> {
-    let color = if atty::is(Stream::Stdout) {
-        AppSettings::ColoredHelp
-    } else {
-        AppSettings::ColorNever
-    };
+    let (input, config) = app::config();
 
-    let matches = App::new(crate_name!())
-        .version(crate_version!())
-        .about(crate_description!())
-        .after_help("create traces with: strace -s 0 -ff -o cmd.strace cmd")
-        .global_setting(color)
-        .max_term_width(80)
-        .help_short("?")
-        .arg(Arg::with_name("file")
-             .help("strace output file name")
-             .long_help("The primary output file name of the strace run. \
-                         Will follow other files created via the strace -ff \
-                         flag, based on the clone syscall.")
-             .required(true)
-             .validator(is_file))
-        .arg(Arg::with_name("debug")
-             .long("debug")
-             .help("debug output"))
-        .arg(Arg::with_name("verbose")
-             .short("v")
-             .long("verbose")
-             .help("verbose output"))
-        .get_matches();
-
-    let input = Path::new(matches.value_of("file").unwrap());
-
-    let config = Config {
-        debug: matches.is_present("debug"),
-        verbose: matches.is_present("verbose"),
-    };
+    let input = Path::new(&input);
 
     let stdin = Summary::new(String::from("STDIN"));
     let stdout = Summary::new(String::from("STDOUT"));
@@ -95,16 +61,4 @@ fn main() -> io::Result<()> {
     fds.insert(2, stderr);
 
     analyze(&mut fds, input, &config)
-}
-
-fn is_file(s: String) -> Result<(), String> {
-    let path = Path::new(&s);
-
-    if !path.exists() {
-        Err(format!("does not exist: {:?}", path))
-    } else if !path.is_file() {
-        Err(format!("is not a file: {:?}", path))
-    } else {
-        Ok(())
-    }
 }
