@@ -54,13 +54,20 @@ fn main() -> io::Result<()> {
         AppSettings::ColorNever
     };
 
-    let matches = App::new("strace-analyzer")
+    let matches = App::new(crate_name!())
         .version(crate_version!())
+        .about(crate_description!())
+        .after_help("create traces with: strace -s 0 -ff -o cmd.strace cmd")
         .global_setting(color)
-        .about("analyze strace output")
+        .max_term_width(80)
+        .help_short("?")
         .arg(Arg::with_name("file")
-             .help("strace log")
-             .required(true))
+             .help("strace output file name")
+             .long_help("The primary output file name of the strace run. \
+                         Will follow other files created via the strace -ff \
+                         flag, based on the clone syscall.")
+             .required(true)
+             .validator(is_file))
         .arg(Arg::with_name("debug")
              .long("debug")
              .help("debug output"))
@@ -88,4 +95,16 @@ fn main() -> io::Result<()> {
     fds.insert(2, stderr);
 
     analyze(&mut fds, input, &config)
+}
+
+fn is_file(s: String) -> Result<(), String> {
+    let path = Path::new(&s);
+
+    if !path.exists() {
+        Err(format!("does not exist: {:?}", path))
+    } else if !path.is_file() {
+        Err(format!("is not a file: {:?}", path))
+    } else {
+        Ok(())
+    }
 }

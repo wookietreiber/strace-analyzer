@@ -14,6 +14,9 @@ categories = ["command-line-utilities"]
 [dependencies]
 atty = "^0.2"
 bytesize = "^1"
-clap = "^2"
 lazy_static = "^1"
 regex = "^1"
+
+[dependencies.clap]
+version = "^2"
+features = ["wrap_help"]
