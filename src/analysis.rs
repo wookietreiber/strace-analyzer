@@ -34,7 +34,23 @@ use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 use std::path::{Path, PathBuf};
 
-pub fn analyze(fds: &mut HashMap<u32, Summary>,
+pub fn run(input: String, config: Config) -> io::Result<()> {
+    let input = Path::new(&input);
+
+    let stdin = Summary::new(String::from("STDIN"));
+    let stdout = Summary::new(String::from("STDOUT"));
+    let stderr = Summary::new(String::from("STDERR"));
+
+    let mut fds: HashMap<u32, Summary> = HashMap::new();
+
+    fds.insert(0, stdin);
+    fds.insert(1, stdout);
+    fds.insert(2, stderr);
+
+    analyze(&mut fds, input, &config)
+}
+
+fn analyze(fds: &mut HashMap<u32, Summary>,
                input: &Path,
                config: &Config) -> io::Result<()> {
     let file = File::open(input)?;

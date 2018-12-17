@@ -38,27 +38,10 @@ mod config;
 mod log;
 mod summary;
 
-use analysis::analyze;
-use summary::Summary;
-
-use std::collections::HashMap;
 use std::io;
-use std::path::Path;
 
 fn main() -> io::Result<()> {
     let (input, config) = app::config();
 
-    let input = Path::new(&input);
-
-    let stdin = Summary::new(String::from("STDIN"));
-    let stdout = Summary::new(String::from("STDOUT"));
-    let stderr = Summary::new(String::from("STDERR"));
-
-    let mut fds: HashMap<u32, Summary> = HashMap::new();
-
-    fds.insert(0, stdin);
-    fds.insert(1, stdout);
-    fds.insert(2, stderr);
-
-    analyze(&mut fds, input, &config)
+    analysis::run(input, config)
 }
