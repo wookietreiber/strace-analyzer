@@ -24,7 +24,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-use config::Config;
+use crate::config::Config;
 
 pub fn debug(message: String, config: &Config) {
     if config.debug {

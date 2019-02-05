@@ -24,11 +24,11 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-use config::Config;
-use log::*;
-
 use bytesize::ByteSize;
 use std::collections::HashMap;
+
+use crate::config::Config;
+use crate::log::debug;
 
 #[derive(Clone)]
 #[derive(Debug)]

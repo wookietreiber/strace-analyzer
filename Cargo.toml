@@ -10,6 +10,7 @@ homepage = "https://github.com/wookietreiber/strace-analyzer"
 repository = "https://github.com/wookietreiber/strace-analyzer"
 keywords = ["strace"]
 categories = ["command-line-utilities"]
+edition = "2018"
 
 [dependencies]
 atty = "^0.2"

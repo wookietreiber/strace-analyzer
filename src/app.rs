@@ -28,7 +28,7 @@ use atty::Stream;
 use clap::{App, AppSettings, Arg};
 use std::path::Path;
 
-use config::*;
+use crate::config::Config;
 
 pub fn config() -> (String, Config) {
     let args = cli_parser().get_matches();

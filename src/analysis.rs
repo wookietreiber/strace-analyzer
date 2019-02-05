@@ -24,15 +24,15 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-use config::Config;
-use log::*;
-use summary::Summary;
-
 use regex::Regex;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 use std::path::{Path, PathBuf};
+
+use crate::config::Config;
+use crate::log::*;
+use crate::summary::Summary;
 
 pub fn run(input: String, config: Config) -> io::Result<()> {
     let input = Path::new(&input);
