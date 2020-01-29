@@ -191,21 +191,21 @@ fn analyze(
             let oldfd: u32 = cap[1].parse().unwrap();
             let newfd: u32 = cap[2].parse().unwrap();
 
-            dup(fds, "dup", &oldfd, newfd, config);
+            dup(fds, "dup", oldfd, newfd, config);
         }
 
         for cap in RE_DUP2.captures_iter(&line) {
             let oldfd: u32 = cap[1].parse().unwrap();
             let newfd: u32 = cap[2].parse().unwrap();
 
-            dup(fds, "dup2", &oldfd, newfd, config);
+            dup(fds, "dup2", oldfd, newfd, config);
         }
 
         for cap in RE_FCNTL_DUP.captures_iter(&line) {
             let oldfd: u32 = cap[1].parse().unwrap();
             let newfd: u32 = cap[2].parse().unwrap();
 
-            dup(fds, "fcntl-dup", &oldfd, newfd, config);
+            dup(fds, "fcntl-dup", oldfd, newfd, config);
         }
 
         for cap in RE_OPEN.captures_iter(&line) {
@@ -314,7 +314,7 @@ fn analyze(
 fn dup(
     fds: &mut HashMap<u32, Summary>,
     syscall: &str,
-    oldfd: &u32,
+    oldfd: u32,
     newfd: u32,
     config: &Config,
 ) {
@@ -387,7 +387,7 @@ fn join_paths(
             if let Some(dir_summary) = fds.get(&dirfd) {
                 let mut path = PathBuf::new();
                 path.push(dir_summary.file.clone());
-                path.push(pathname.clone());
+                path.push(pathname);
 
                 if let Some(path) = path.to_str() {
                     String::from(path)
