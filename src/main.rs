@@ -23,7 +23,6 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-
 extern crate atty;
 extern crate bytesize;
 #[macro_use]
@@ -32,8 +31,8 @@ extern crate clap;
 extern crate lazy_static;
 extern crate regex;
 
-mod app;
 mod analysis;
+mod app;
 mod config;
 mod log;
 mod summary;

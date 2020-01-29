@@ -23,7 +23,6 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-
 pub struct Config {
     pub debug: bool,
     pub verbose: bool,

@@ -23,15 +23,13 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-
 use bytesize::ByteSize;
 use std::collections::HashMap;
 
 use crate::config::Config;
 use crate::log::debug;
 
-#[derive(Clone)]
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Summary {
     pub file: String,
     read_freq: HashMap<u64, u64>,
@@ -79,27 +77,28 @@ impl Summary {
     }
 
     pub fn show(&self, config: &Config) {
-        if !config.verbose &&
-            (self.file.starts_with("/bin/") ||
-             self.file == "/dev/null" ||
-             self.file.starts_with("/etc/") ||
-             self.file.starts_with("/lib/") ||
-             self.file.starts_with("/lib64/") ||
-             self.file.starts_with("/opt/") ||
-             self.file.starts_with("/proc/") ||
-             self.file.starts_with("/run/") ||
-             self.file.starts_with("/sbin/") ||
-             self.file.starts_with("/sys/") ||
-             self.file.starts_with("/tmp/") ||
-             self.file.starts_with("/usr/") ||
-             self.file == "STDOUT" ||
-             self.file == "STDERR" ||
-             self.file == "STDIN" ||
-             self.file == "SOCKET" ||
-             self.file == "DUP" ||
-             self.file == "PIPE") {
-                return;
-            }
+        if !config.verbose
+            && (self.file.starts_with("/bin/")
+                || self.file == "/dev/null"
+                || self.file.starts_with("/etc/")
+                || self.file.starts_with("/lib/")
+                || self.file.starts_with("/lib64/")
+                || self.file.starts_with("/opt/")
+                || self.file.starts_with("/proc/")
+                || self.file.starts_with("/run/")
+                || self.file.starts_with("/sbin/")
+                || self.file.starts_with("/sys/")
+                || self.file.starts_with("/tmp/")
+                || self.file.starts_with("/usr/")
+                || self.file == "STDOUT"
+                || self.file == "STDERR"
+                || self.file == "STDIN"
+                || self.file == "SOCKET"
+                || self.file == "DUP"
+                || self.file == "PIPE")
+        {
+            return;
+        }
 
         if self.read_freq.is_empty() && self.write_freq.is_empty() {
             debug(format!("no I/O with {}", self.file), config);

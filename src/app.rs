@@ -23,7 +23,6 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-
 use atty::Stream;
 use clap::{App, AppSettings, Arg};
 use std::path::Path;
@@ -39,10 +38,7 @@ pub fn config() -> (String, Config) {
 
     let verbose = args.is_present("verbose");
 
-    let config = Config {
-        debug,
-        verbose,
-    };
+    let config = Config { debug, verbose };
 
     (String::from(input), config)
 }
@@ -65,22 +61,26 @@ fn cli_parser() -> App<'static, 'static> {
         .help_short("?")
         .help_message("show this help output")
         .version_message("show version")
-        .arg(Arg::with_name("file")
-             .help("strace output file name")
-             .long_help("The primary output file name of the strace run. \
-                         strace-analyzer will follow other strace files \
-                         created via the strace -ff flag. The followed files \
-                         are determined based on the clone syscalls that are \
-                         encountered in the traces.")
-             .required(true)
-             .validator(is_file))
-        .arg(Arg::with_name("debug")
-             .long("debug")
-             .help("debug output"))
-        .arg(Arg::with_name("verbose")
-             .short("v")
-             .long("verbose")
-             .help("verbose output"))
+        .arg(
+            Arg::with_name("file")
+                .help("strace output file name")
+                .long_help(
+                    "The primary output file name of the strace run. \
+                     strace-analyzer will follow other strace files \
+                     created via the strace -ff flag. The followed files \
+                     are determined based on the clone syscalls that are \
+                     encountered in the traces.",
+                )
+                .required(true)
+                .validator(is_file),
+        )
+        .arg(Arg::with_name("debug").long("debug").help("debug output"))
+        .arg(
+            Arg::with_name("verbose")
+                .short("v")
+                .long("verbose")
+                .help("verbose output"),
+        )
 }
 
 fn is_file(s: String) -> Result<(), String> {
