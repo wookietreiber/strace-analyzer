@@ -25,9 +25,7 @@
 
 extern crate atty;
 extern crate bytesize;
-#[macro_use]
 extern crate clap;
-#[macro_use]
 extern crate lazy_static;
 extern crate regex;
 

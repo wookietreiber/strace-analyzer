@@ -24,6 +24,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 use atty::Stream;
+use clap::{crate_description, crate_name, crate_version};
 use clap::{App, AppSettings, Arg};
 use std::path::Path;
 
