@@ -21,3 +21,12 @@ regex = "^1"
 [dependencies.clap]
 version = "^2"
 features = ["wrap_help"]
+
+[dependencies.prettytable-rs]
+version = "^0.8"
+optional = true
+default_features = false
+
+[features]
+default = ["table"]
+table = ["prettytable-rs"]

@@ -23,28 +23,37 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-extern crate atty;
-extern crate bytesize;
-extern crate clap;
-extern crate lazy_static;
-extern crate regex;
+use std::str::FromStr;
 
-mod analysis;
-mod app;
-mod config;
-mod log;
-mod output;
-mod summary;
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum Output {
+    Continuous,
+    #[cfg(feature = "table")]
+    Table,
+}
 
-use std::io;
+impl Output {
+    pub fn variants() -> Vec<&'static str> {
+        vec![
+            "continuous",
+            #[cfg(feature = "table")]
+            "table",
+        ]
+    }
+}
 
-use crate::config::Config;
+impl FromStr for Output {
+    type Err = String;
 
-fn main() -> io::Result<()> {
-    let args = app::build().get_matches();
-    let config = Config::from_args(&args);
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let s = s.to_lowercase();
+        let s = s.as_str();
 
-    let input = args.value_of("input").unwrap();
-
-    analysis::run(input, config)
+        match s {
+            "continuous" => Ok(Output::Continuous),
+            #[cfg(feature = "table")]
+            "table" => Ok(Output::Table),
+            _ => Err(String::from("invalid output")),
+        }
+    }
 }

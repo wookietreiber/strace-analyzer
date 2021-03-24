@@ -28,23 +28,9 @@ use clap::{crate_description, crate_name, crate_version};
 use clap::{App, AppSettings, Arg};
 use std::path::Path;
 
-use crate::config::Config;
+use crate::output::Output;
 
-pub fn config() -> (String, Config) {
-    let args = cli_parser().get_matches();
-
-    let input = args.value_of("file").unwrap();
-
-    let debug = args.is_present("debug");
-
-    let verbose = args.is_present("verbose");
-
-    let config = Config { debug, verbose };
-
-    (String::from(input), config)
-}
-
-fn cli_parser() -> App<'static, 'static> {
+pub fn build() -> App<'static, 'static> {
     let color = atty::is(Stream::Stdout);
 
     let color = if color {
@@ -52,6 +38,39 @@ fn cli_parser() -> App<'static, 'static> {
     } else {
         AppSettings::ColorNever
     };
+
+    let input = Arg::with_name("input")
+        .help("strace output file name")
+        .long_help(
+"The primary output file name of the strace run. strace-analyzer will follow \
+ other strace files created via the strace -ff flag. The followed files are \
+ determined based on the clone syscalls that are encountered in the traces."
+        )
+        .required(true)
+        .validator(is_file);
+
+    let output_format = Arg::with_name("output_format")
+        .long("output")
+        .help("output format")
+        .long_help("Specify output format of the report.")
+        .takes_value(true)
+        .case_insensitive(true)
+        .possible_values(&Output::variants())
+        .display_order(1);
+
+    let output_format = if cfg!(feature = "table") && atty::is(Stream::Stdout)
+    {
+        output_format.default_value("table")
+    } else {
+        output_format.default_value("continuous")
+    };
+
+    let debug = Arg::with_name("debug").long("debug").help("debug output");
+
+    let verbose = Arg::with_name("verbose")
+        .short("v")
+        .long("verbose")
+        .help("verbose output");
 
     App::new(crate_name!())
         .version(crate_version!())
@@ -62,26 +81,10 @@ fn cli_parser() -> App<'static, 'static> {
         .help_short("?")
         .help_message("show this help output")
         .version_message("show version")
-        .arg(
-            Arg::with_name("file")
-                .help("strace output file name")
-                .long_help(
-                    "The primary output file name of the strace run. \
-                     strace-analyzer will follow other strace files \
-                     created via the strace -ff flag. The followed files \
-                     are determined based on the clone syscalls that are \
-                     encountered in the traces.",
-                )
-                .required(true)
-                .validator(is_file),
-        )
-        .arg(Arg::with_name("debug").long("debug").help("debug output"))
-        .arg(
-            Arg::with_name("verbose")
-                .short("v")
-                .long("verbose")
-                .help("verbose output"),
-        )
+        .arg(input)
+        .arg(output_format)
+        .arg(debug)
+        .arg(verbose)
 }
 
 fn is_file(s: String) -> Result<(), String> {

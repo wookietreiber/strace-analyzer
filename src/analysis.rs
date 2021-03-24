@@ -23,18 +23,21 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-use lazy_static::lazy_static;
-use regex::Regex;
+use std::cell::RefCell;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 use std::path::{Path, PathBuf};
 
+use lazy_static::lazy_static;
+use regex::Regex;
+
 use crate::config::Config;
 use crate::log::*;
-use crate::summary::Summary;
+use crate::output::Output;
+use crate::summary::{show_table, Summary};
 
-pub fn run(input: String, config: Config) -> io::Result<()> {
+pub fn run(input: &str, config: Config) -> io::Result<()> {
     let input = Path::new(&input);
 
     let stdin = Summary::new("STDIN");
@@ -47,18 +50,41 @@ pub fn run(input: String, config: Config) -> io::Result<()> {
     fds.insert(1, stdout);
     fds.insert(2, stderr);
 
-    analyze(fds, input, &config)
+    match config.output {
+        Output::Continuous => {
+            analyze(fds, input, |summary| summary.show(&config), &config)
+        }
+
+        Output::Table => {
+            let summaries = RefCell::new(vec![]);
+
+            analyze(
+                fds,
+                input,
+                |summary| summaries.borrow_mut().push(summary),
+                &config,
+            )?;
+
+            show_table(&summaries.into_inner(), &config);
+
+            Ok(())
+        }
+    }
 }
 
-fn analyze(
+fn analyze<F>(
     mut fds: HashMap<u32, Summary>,
     input: &Path,
+    f: F,
     config: &Config,
-) -> io::Result<()> {
+) -> io::Result<()>
+where
+    F: Fn(Summary) + Copy,
+{
     let file = File::open(input)?;
 
-    for l in BufReader::new(file).lines() {
-        let line = l?;
+    for line in BufReader::new(file).lines() {
+        let line = line?;
 
         for cap in RE_CREAT.captures_iter(&line) {
             let file = &cap[1];
@@ -67,7 +93,7 @@ fn analyze(
             debug(format!("[creat] {} => {}", fd, file), config);
 
             let syscall = "creat";
-            insert(&mut fds, fd, Summary::new(file), syscall, config);
+            insert(&mut fds, fd, Summary::new(file), syscall, f, config);
         }
 
         for cap in RE_CLOSE.captures_iter(&line) {
@@ -77,7 +103,7 @@ fn analyze(
             let syscall = "close";
 
             match (status, error) {
-                (0, _) => finish(&mut fds, fd, syscall, config),
+                (0, _) => finish(&mut fds, fd, syscall, f, config),
 
                 (_, "EBADF") => {
                     debug(format!("[close] {} => bad fd", fd), config)
@@ -85,7 +111,7 @@ fn analyze(
 
                 (_, error) => {
                     verbose(format!("[close] {} => {}", fd, error), config);
-                    finish(&mut fds, fd, syscall, config)
+                    finish(&mut fds, fd, syscall, f, config)
                 }
             }
         }
@@ -106,7 +132,7 @@ fn analyze(
                 summary.reset();
             }
 
-            analyze(cfds, &trace, config)?;
+            analyze(cfds, &trace, f, config)?;
 
             verbose(format!("[clone] tracing pid {} finished", pid), config);
         }
@@ -115,21 +141,21 @@ fn analyze(
             let oldfd: u32 = cap[1].parse().unwrap();
             let newfd: u32 = cap[2].parse().unwrap();
 
-            dup(&mut fds, "dup", oldfd, newfd, config);
+            dup(&mut fds, "dup", oldfd, newfd, f, config);
         }
 
         for cap in RE_DUP2.captures_iter(&line) {
             let oldfd: u32 = cap[1].parse().unwrap();
             let newfd: u32 = cap[2].parse().unwrap();
 
-            dup(&mut fds, "dup2", oldfd, newfd, config);
+            dup(&mut fds, "dup2", oldfd, newfd, f, config);
         }
 
         for cap in RE_FCNTL_DUP.captures_iter(&line) {
             let oldfd: u32 = cap[1].parse().unwrap();
             let newfd: u32 = cap[2].parse().unwrap();
 
-            dup(&mut fds, "fcntl-dup", oldfd, newfd, config);
+            dup(&mut fds, "fcntl-dup", oldfd, newfd, f, config);
         }
 
         for cap in RE_OPEN.captures_iter(&line) {
@@ -139,7 +165,7 @@ fn analyze(
             debug(format!("[open] {} => {}", fd, file), config);
 
             let syscall = "open";
-            insert(&mut fds, fd, Summary::new(file), syscall, config);
+            insert(&mut fds, fd, Summary::new(file), syscall, f, config);
         }
 
         for cap in RE_OPENAT.captures_iter(&line) {
@@ -152,7 +178,7 @@ fn analyze(
             debug(format!("[openat] {} => {}", fd, file), config);
 
             let syscall = "openat";
-            insert(&mut fds, fd, Summary::new(&file), syscall, config);
+            insert(&mut fds, fd, Summary::new(&file), syscall, f, config);
         }
 
         for cap in RE_PIPE.captures_iter(&line) {
@@ -162,8 +188,8 @@ fn analyze(
             debug(format!("[pipe] {} => {}", readend, writeend), config);
 
             let syscall = "pipe";
-            insert(&mut fds, readend, Summary::pipe(), syscall, config);
-            insert(&mut fds, writeend, Summary::pipe(), syscall, config);
+            insert(&mut fds, readend, Summary::pipe(), syscall, f, config);
+            insert(&mut fds, writeend, Summary::pipe(), syscall, f, config);
         }
 
         for cap in RE_PREAD.captures_iter(&line) {
@@ -208,7 +234,7 @@ fn analyze(
             debug(format!("[socket] {}", fd), config);
 
             let syscall = "socket";
-            insert(&mut fds, fd, Summary::socket(), syscall, config);
+            insert(&mut fds, fd, Summary::socket(), syscall, f, config);
         }
 
         for cap in RE_WRITE.captures_iter(&line) {
@@ -224,8 +250,8 @@ fn analyze(
         }
     }
 
-    for (_, summary) in fds.iter() {
-        summary.show(config);
+    for (_, summary) in fds {
+        f(summary);
     }
 
     Ok(())
@@ -235,13 +261,16 @@ fn analyze(
 // helpers
 // ----------------------------------------------------------------------------
 
-fn dup(
+fn dup<F>(
     fds: &mut HashMap<u32, Summary>,
     syscall: &str,
     oldfd: u32,
     newfd: u32,
+    f: F,
     config: &Config,
-) {
+) where
+    F: Fn(Summary) + Copy,
+{
     let summary = if let Some(summary_old) = fds.get(&oldfd) {
         let old_file = &summary_old.file;
 
@@ -260,31 +289,37 @@ fn dup(
         Summary::new("DUP")
     };
 
-    insert(fds, newfd, summary, syscall, config);
+    insert(fds, newfd, summary, syscall, f, config);
 }
 
-fn finish(
+fn finish<F>(
     fds: &mut HashMap<u32, Summary>,
     fd: u32,
     syscall: &str,
+    f: F,
     config: &Config,
-) {
+) where
+    F: Fn(Summary) + Copy,
+{
     if let Some(summary) = fds.remove(&fd) {
         debug(format!("[{}] {} => {}", syscall, fd, summary.file), config);
 
-        summary.show(config);
+        f(summary);
     } else {
         verbose(format!("[{}] unknown fd {}", syscall, fd), config);
     }
 }
 
-fn insert(
+fn insert<F>(
     fds: &mut HashMap<u32, Summary>,
     fd: u32,
     summary: Summary,
     syscall: &str,
+    f: F,
     config: &Config,
-) {
+) where
+    F: Fn(Summary) + Copy,
+{
     if let Some(summary) = fds.insert(fd, summary) {
         debug(
             format!(
@@ -294,7 +329,7 @@ fn insert(
             config,
         );
 
-        summary.show(config)
+        f(summary);
     };
 }
 
