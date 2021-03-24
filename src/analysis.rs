@@ -57,83 +57,6 @@ fn analyze(
 ) -> io::Result<()> {
     let file = File::open(input)?;
 
-    lazy_static! {
-        static ref RE_CLONE: Regex =
-            Regex::new(r#"^clone\(.*\)\s+= (\d+)$"#).unwrap();
-    }
-
-    lazy_static! {
-        static ref RE_CLOSE: Regex =
-            Regex::new(r#"^close\((\d+)\)\s+= (-?\d+)\s*([A-Z]*).*$"#)
-                .unwrap();
-    }
-
-    lazy_static! {
-        static ref RE_CREAT: Regex =
-            Regex::new(r#"^creat\("([^"]+)", .+\)\s+= (\d+)$"#).unwrap();
-    }
-
-    lazy_static! {
-        static ref RE_DUP: Regex =
-            Regex::new(r#"^dup\((\d+)\)\s+= (\d+)$"#).unwrap();
-    }
-
-    lazy_static! {
-        static ref RE_DUP2: Regex =
-            Regex::new(r#"^dup2\((\d+), \d+\)\s+= (\d+)$"#).unwrap();
-    }
-
-    lazy_static! {
-        static ref RE_FCNTL_DUP: Regex =
-            Regex::new(r#"^fcntl\((\d+), F_DUPFD, \d+\)\s+= (\d+)$"#).unwrap();
-    }
-
-    lazy_static! {
-        static ref RE_OPEN: Regex = Regex::new(
-            // we're ignoring failures on purpose because they don't open fd
-            r#"^open\("([^"]+)", .+\)\s+= (\d+)$"#
-        ).unwrap();
-    }
-
-    lazy_static! {
-        static ref RE_OPENAT: Regex = Regex::new(
-            r#"^openat\((\d+|AT_FDCWD), "([^"]+)", .+\)\s+= (\d+)$"#
-        )
-        .unwrap();
-    }
-
-    lazy_static! {
-        static ref RE_PIPE: Regex =
-            Regex::new(r#"^pipe\(\[(\d+), (\d+)\]\)\s+= (\d+)$"#).unwrap();
-    }
-
-    lazy_static! {
-        static ref RE_PREAD: Regex =
-            Regex::new(r#"^pread\((\d+),.*, (\d+), \d+\)\s+= (\d+)$"#)
-                .unwrap();
-    }
-
-    lazy_static! {
-        static ref RE_PWRITE: Regex =
-            Regex::new(r#"^pwrite\((\d+),.*, (\d+), \d+\)\s+= (\d+)$"#)
-                .unwrap();
-    }
-
-    lazy_static! {
-        static ref RE_READ: Regex =
-            Regex::new(r#"^read\((\d+),.*, (\d+)\)\s+= (\d+)$"#).unwrap();
-    }
-
-    lazy_static! {
-        static ref RE_SOCKET: Regex =
-            Regex::new(r#"^socket\(.*\)\s+= (\d+)$"#).unwrap();
-    }
-
-    lazy_static! {
-        static ref RE_WRITE: Regex =
-            Regex::new(r#"^write\((\d+),.*, (\d+)\)\s+= (\d+)$"#).unwrap();
-    }
-
     for l in BufReader::new(file).lines() {
         let line = l?;
 
@@ -400,4 +323,81 @@ fn join_paths(
             }
         }
     }
+}
+
+// ----------------------------------------------------------------------------
+// regexes
+// ----------------------------------------------------------------------------
+
+lazy_static! {
+    static ref RE_CLONE: Regex =
+        Regex::new(r#"^clone\(.*\)\s+= (\d+)$"#).unwrap();
+}
+
+lazy_static! {
+    static ref RE_CLOSE: Regex =
+        Regex::new(r#"^close\((\d+)\)\s+= (-?\d+)\s*([A-Z]*).*$"#).unwrap();
+}
+
+lazy_static! {
+    static ref RE_CREAT: Regex =
+        Regex::new(r#"^creat\("([^"]+)", .+\)\s+= (\d+)$"#).unwrap();
+}
+
+lazy_static! {
+    static ref RE_DUP: Regex =
+        Regex::new(r#"^dup\((\d+)\)\s+= (\d+)$"#).unwrap();
+}
+
+lazy_static! {
+    static ref RE_DUP2: Regex =
+        Regex::new(r#"^dup2\((\d+), \d+\)\s+= (\d+)$"#).unwrap();
+}
+
+lazy_static! {
+    static ref RE_FCNTL_DUP: Regex =
+        Regex::new(r#"^fcntl\((\d+), F_DUPFD, \d+\)\s+= (\d+)$"#).unwrap();
+}
+
+lazy_static! {
+    static ref RE_OPEN: Regex = Regex::new(
+        // we're ignoring failures on purpose because they don't open fd
+        r#"^open\("([^"]+)", .+\)\s+= (\d+)$"#
+    ).unwrap();
+}
+
+lazy_static! {
+    static ref RE_OPENAT: Regex =
+        Regex::new(r#"^openat\((\d+|AT_FDCWD), "([^"]+)", .+\)\s+= (\d+)$"#)
+            .unwrap();
+}
+
+lazy_static! {
+    static ref RE_PIPE: Regex =
+        Regex::new(r#"^pipe\(\[(\d+), (\d+)\]\)\s+= (\d+)$"#).unwrap();
+}
+
+lazy_static! {
+    static ref RE_PREAD: Regex =
+        Regex::new(r#"^pread\((\d+),.*, (\d+), \d+\)\s+= (\d+)$"#).unwrap();
+}
+
+lazy_static! {
+    static ref RE_PWRITE: Regex =
+        Regex::new(r#"^pwrite\((\d+),.*, (\d+), \d+\)\s+= (\d+)$"#).unwrap();
+}
+
+lazy_static! {
+    static ref RE_READ: Regex =
+        Regex::new(r#"^read\((\d+),.*, (\d+)\)\s+= (\d+)$"#).unwrap();
+}
+
+lazy_static! {
+    static ref RE_SOCKET: Regex =
+        Regex::new(r#"^socket\(.*\)\s+= (\d+)$"#).unwrap();
+}
+
+lazy_static! {
+    static ref RE_WRITE: Regex =
+        Regex::new(r#"^write\((\d+),.*, (\d+)\)\s+= (\d+)$"#).unwrap();
 }
