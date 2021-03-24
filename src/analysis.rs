@@ -47,11 +47,11 @@ pub fn run(input: String, config: Config) -> io::Result<()> {
     fds.insert(1, stdout);
     fds.insert(2, stderr);
 
-    analyze(&mut fds, input, &config)
+    analyze(fds, input, &config)
 }
 
 fn analyze(
-    fds: &mut HashMap<u32, Summary>,
+    mut fds: HashMap<u32, Summary>,
     input: &Path,
     config: &Config,
 ) -> io::Result<()> {
@@ -67,7 +67,7 @@ fn analyze(
             debug(format!("[creat] {} => {}", fd, file), config);
 
             let syscall = "creat";
-            insert(fds, fd, Summary::new(file), syscall, config);
+            insert(&mut fds, fd, Summary::new(file), syscall, config);
         }
 
         for cap in RE_CLOSE.captures_iter(&line) {
@@ -77,7 +77,7 @@ fn analyze(
             let syscall = "close";
 
             match (status, error) {
-                (0, _) => finish(fds, fd, syscall, config),
+                (0, _) => finish(&mut fds, fd, syscall, config),
 
                 (_, "EBADF") => {
                     debug(format!("[close] {} => bad fd", fd), config)
@@ -85,7 +85,7 @@ fn analyze(
 
                 (_, error) => {
                     verbose(format!("[close] {} => {}", fd, error), config);
-                    finish(fds, fd, syscall, config)
+                    finish(&mut fds, fd, syscall, config)
                 }
             }
         }
@@ -106,7 +106,7 @@ fn analyze(
                 summary.reset();
             }
 
-            analyze(&mut cfds, &trace, config)?;
+            analyze(cfds, &trace, config)?;
 
             verbose(format!("[clone] tracing pid {} finished", pid), config);
         }
@@ -115,21 +115,21 @@ fn analyze(
             let oldfd: u32 = cap[1].parse().unwrap();
             let newfd: u32 = cap[2].parse().unwrap();
 
-            dup(fds, "dup", oldfd, newfd, config);
+            dup(&mut fds, "dup", oldfd, newfd, config);
         }
 
         for cap in RE_DUP2.captures_iter(&line) {
             let oldfd: u32 = cap[1].parse().unwrap();
             let newfd: u32 = cap[2].parse().unwrap();
 
-            dup(fds, "dup2", oldfd, newfd, config);
+            dup(&mut fds, "dup2", oldfd, newfd, config);
         }
 
         for cap in RE_FCNTL_DUP.captures_iter(&line) {
             let oldfd: u32 = cap[1].parse().unwrap();
             let newfd: u32 = cap[2].parse().unwrap();
 
-            dup(fds, "fcntl-dup", oldfd, newfd, config);
+            dup(&mut fds, "fcntl-dup", oldfd, newfd, config);
         }
 
         for cap in RE_OPEN.captures_iter(&line) {
@@ -139,7 +139,7 @@ fn analyze(
             debug(format!("[open] {} => {}", fd, file), config);
 
             let syscall = "open";
-            insert(fds, fd, Summary::new(file), syscall, config);
+            insert(&mut fds, fd, Summary::new(file), syscall, config);
         }
 
         for cap in RE_OPENAT.captures_iter(&line) {
@@ -147,12 +147,12 @@ fn analyze(
             let pathname = &cap[2];
             let fd: u32 = cap[3].parse().unwrap();
 
-            let file = join_paths(fds, dirfd, pathname);
+            let file = join_paths(&fds, dirfd, pathname);
 
             debug(format!("[openat] {} => {}", fd, file), config);
 
             let syscall = "openat";
-            insert(fds, fd, Summary::new(&file), syscall, config);
+            insert(&mut fds, fd, Summary::new(&file), syscall, config);
         }
 
         for cap in RE_PIPE.captures_iter(&line) {
@@ -162,8 +162,8 @@ fn analyze(
             debug(format!("[pipe] {} => {}", readend, writeend), config);
 
             let syscall = "pipe";
-            insert(fds, readend, Summary::pipe(), syscall, config);
-            insert(fds, writeend, Summary::pipe(), syscall, config);
+            insert(&mut fds, readend, Summary::pipe(), syscall, config);
+            insert(&mut fds, writeend, Summary::pipe(), syscall, config);
         }
 
         for cap in RE_PREAD.captures_iter(&line) {
@@ -208,7 +208,7 @@ fn analyze(
             debug(format!("[socket] {}", fd), config);
 
             let syscall = "socket";
-            insert(fds, fd, Summary::socket(), syscall, config);
+            insert(&mut fds, fd, Summary::socket(), syscall, config);
         }
 
         for cap in RE_WRITE.captures_iter(&line) {
