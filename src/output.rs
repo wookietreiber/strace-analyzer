@@ -1,6 +1,6 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                                                                           *
- *  Copyright  (C)  2015-2021  Christian Krause                              *
+ *  Copyright  (C)  2015-2022  Christian Krause                              *
  *                                                                           *
  *  Christian Krause  <christian.krause@mailbox.org>                         *
  *                                                                           *
@@ -25,6 +25,8 @@
 
 use std::str::FromStr;
 
+use anyhow::{anyhow, Result};
+
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Output {
     Continuous,
@@ -42,18 +44,28 @@ impl Output {
     }
 }
 
+impl Default for Output {
+    fn default() -> Self {
+        if cfg!(feature = "table") {
+            Self::Table
+        } else {
+            Self::Continuous
+        }
+    }
+}
+
 impl FromStr for Output {
-    type Err = String;
+    type Err = anyhow::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let s = s.to_lowercase();
         let s = s.as_str();
 
         match s {
-            "continuous" => Ok(Output::Continuous),
+            "continuous" => Ok(Self::Continuous),
             #[cfg(feature = "table")]
-            "table" => Ok(Output::Table),
-            _ => Err(String::from("invalid output")),
+            "table" => Ok(Self::Table),
+            _ => Err(anyhow!("invalid output")),
         }
     }
 }

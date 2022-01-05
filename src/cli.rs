@@ -1,6 +1,6 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                                                                           *
- *  Copyright  (C)  2015-2021  Christian Krause                              *
+ *  Copyright  (C)  2015-2022  Christian Krause                              *
  *                                                                           *
  *  Christian Krause  <christian.krause@mailbox.org>                         *
  *                                                                           *
@@ -25,21 +25,13 @@
 
 use atty::Stream;
 use clap::{crate_description, crate_name, crate_version};
-use clap::{App, AppSettings, Arg};
+use clap::{App, Arg};
 use std::path::Path;
 
 use crate::output::Output;
 
-pub fn build() -> App<'static, 'static> {
-    let color = atty::is(Stream::Stdout);
-
-    let color = if color {
-        AppSettings::ColoredHelp
-    } else {
-        AppSettings::ColorNever
-    };
-
-    let input = Arg::with_name("input")
+pub fn build() -> App<'static> {
+    let input = Arg::new("input")
         .help("strace output file name")
         .long_help(
 "The primary output file name of the strace run. strace-analyzer will follow \
@@ -49,13 +41,13 @@ pub fn build() -> App<'static, 'static> {
         .required(true)
         .validator(is_file);
 
-    let output_format = Arg::with_name("output_format")
+    let output_format = Arg::new("output_format")
         .long("output")
         .help("output format")
         .long_help("Specify output format of the report.")
         .takes_value(true)
-        .case_insensitive(true)
-        .possible_values(&Output::variants())
+        .ignore_case(true)
+        .possible_values(Output::variants())
         .display_order(1);
 
     let output_format = if cfg!(feature = "table") && atty::is(Stream::Stdout)
@@ -65,10 +57,13 @@ pub fn build() -> App<'static, 'static> {
         output_format.default_value("continuous")
     };
 
-    let debug = Arg::with_name("debug").long("debug").help("debug output");
+    let debug = Arg::new("debug")
+        .long("debug")
+        .long_help("Show debug output.")
+        .hide_short_help(true);
 
-    let verbose = Arg::with_name("verbose")
-        .short("v")
+    let verbose = Arg::new("verbose")
+        .short('v')
         .long("verbose")
         .help("verbose output");
 
@@ -76,25 +71,27 @@ pub fn build() -> App<'static, 'static> {
         .version(crate_version!())
         .about(crate_description!())
         .after_help("create traces with: strace -s 0 -ff -o cmd.strace cmd")
-        .global_setting(color)
         .max_term_width(80)
-        .help_short("?")
-        .help_message("show this help output")
-        .version_message("show version")
         .arg(input)
         .arg(output_format)
         .arg(debug)
         .arg(verbose)
+        .mut_arg("help", |a| {
+            a.short('?').help("print help").long_help("Print help.")
+        })
+        .mut_arg("version", |a| {
+            a.hide_short_help(true).long_help("Print version.")
+        })
 }
 
-fn is_file(s: String) -> Result<(), String> {
+fn is_file(s: &str) -> Result<(), String> {
     let path = Path::new(&s);
 
     if !path.exists() {
         Err(format!("does not exist: {:?}", path))
-    } else if !path.is_file() {
-        Err(format!("is not a file: {:?}", path))
-    } else {
+    } else if path.is_file() {
         Ok(())
+    } else {
+        Err(format!("is not a file: {:?}", path))
     }
 }

@@ -1,6 +1,6 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                                                                           *
- *  Copyright  (C)  2015-2021  Christian Krause                              *
+ *  Copyright  (C)  2015-2022  Christian Krause                              *
  *                                                                           *
  *  Christian Krause  <christian.krause@mailbox.org>                         *
  *                                                                           *
@@ -23,26 +23,23 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-extern crate atty;
-extern crate bytesize;
-extern crate clap;
-extern crate lazy_static;
-extern crate regex;
+#![deny(clippy::all)]
+#![warn(clippy::pedantic, clippy::nursery, clippy::cargo)]
 
 mod analysis;
-mod app;
+mod cli;
 mod config;
 mod log;
 mod output;
 mod summary;
 
-use std::io;
+use anyhow::Result;
 
 use crate::config::Config;
 
-fn main() -> io::Result<()> {
-    let args = app::build().get_matches();
-    let config = Config::from_args(&args);
+fn main() -> Result<()> {
+    let args = cli::build().get_matches();
+    let config = Config::try_from(&args)?;
 
     let input = args.value_of("input").unwrap();
 

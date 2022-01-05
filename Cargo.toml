@@ -1,6 +1,6 @@
 [package]
 name = "strace-analyzer"
-version = "0.4.0"
+version = "0.5.0"
 authors = ["Christian Krause <christian.krause@mailbox.org>"]
 description = "analyze strace output"
 license = "GPL-3.0-or-later"
@@ -10,23 +10,29 @@ homepage = "https://github.com/wookietreiber/strace-analyzer"
 repository = "https://github.com/wookietreiber/strace-analyzer"
 keywords = ["strace"]
 categories = ["command-line-utilities"]
-edition = "2018"
+edition = "2021"
 
 [dependencies]
-atty = "^0.2"
-bytesize = "^1"
-lazy_static = "^1"
-regex = "^1"
+anyhow = "1"
+atty = "0.2"
+bytesize = "1"
+lazy_static = "1"
+regex = "1"
 
 [dependencies.clap]
-version = "^2"
-features = ["wrap_help"]
+version = "3"
+features = ["cargo", "wrap_help"]
 
 [dependencies.prettytable-rs]
-version = "^0.8"
+version = "0.8"
 optional = true
 default_features = false
 
 [features]
 default = ["table"]
 table = ["prettytable-rs"]
+
+[dev-dependencies]
+assert_cmd = "2"
+assert_fs = "1"
+predicates = "2"

@@ -1,6 +1,6 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                                                                           *
- *  Copyright  (C)  2015-2021  Christian Krause                              *
+ *  Copyright  (C)  2015-2022  Christian Krause                              *
  *                                                                           *
  *  Christian Krause  <christian.krause@mailbox.org>                         *
  *                                                                           *
@@ -23,29 +23,33 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-use clap::value_t;
+use anyhow::{Context, Result};
 use clap::ArgMatches;
 
 use crate::output::Output;
 
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug, Default)]
 pub struct Config {
     pub debug: bool,
     pub verbose: bool,
     pub output: Output,
 }
 
-impl Config {
-    pub fn from_args(args: &ArgMatches) -> Config {
+impl TryFrom<&ArgMatches> for Config {
+    type Error = anyhow::Error;
+
+    fn try_from(args: &ArgMatches) -> Result<Self> {
         let debug = args.is_present("debug");
         let verbose = args.is_present("verbose");
 
-        let output = value_t!(args, "output_format", Output).unwrap();
+        let output = args
+            .value_of_t("output_format")
+            .with_context(|| "no output format specified")?;
 
-        Config {
+        Ok(Self {
             debug,
             verbose,
             output,
-        }
+        })
     }
 }

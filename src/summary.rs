@@ -1,6 +1,6 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                                                                           *
- *  Copyright  (C)  2015-2021  Christian Krause                              *
+ *  Copyright  (C)  2015-2022  Christian Krause                              *
  *                                                                           *
  *  Christian Krause  <christian.krause@mailbox.org>                         *
  *                                                                           *
@@ -32,7 +32,7 @@ use prettytable::{cell, format::FormatBuilder, Row, Table};
 use crate::config::Config;
 use crate::log::debug;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Summary {
     pub file: String,
     pub read_freq: HashMap<u64, u64>,
@@ -42,8 +42,8 @@ pub struct Summary {
 }
 
 impl Summary {
-    pub fn new(file: &str) -> Summary {
-        Summary {
+    pub fn new(file: &str) -> Self {
+        Self {
             file: String::from(file),
             read_freq: HashMap::new(),
             write_freq: HashMap::new(),
@@ -52,12 +52,12 @@ impl Summary {
         }
     }
 
-    pub fn pipe() -> Summary {
-        Summary::new("PIPE")
+    pub fn pipe() -> Self {
+        Self::new("PIPE")
     }
 
-    pub fn socket() -> Summary {
-        Summary::new("SOCKET")
+    pub fn socket() -> Self {
+        Self::new("SOCKET")
     }
 
     pub fn reset(&mut self) {
@@ -79,7 +79,7 @@ impl Summary {
         self.write_bytes += bytes;
     }
 
-    pub fn should_show(&self, config: &Config) -> bool {
+    pub fn should_show(&self, config: Config) -> bool {
         config.verbose
             || !(self.file.starts_with("/bin/")
                 || self.file == "/dev/null"
@@ -101,7 +101,7 @@ impl Summary {
                 || self.file == "PIPE")
     }
 
-    pub fn show(&self, config: &Config) {
+    pub fn show(&self, config: Config) {
         if !self.should_show(config) {
             return;
         }
@@ -148,7 +148,7 @@ fn humanize(bytes: u64) -> String {
 }
 
 #[cfg(feature = "table")]
-pub fn show_table(summaries: &[Summary], config: &Config) {
+pub fn show_table(summaries: &[Summary], config: Config) {
     let format = FormatBuilder::new().column_separator(' ').build();
 
     let mut r_table = Table::new();

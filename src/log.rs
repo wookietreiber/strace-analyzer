@@ -1,6 +1,6 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                                                                           *
- *  Copyright  (C)  2015-2021  Christian Krause                              *
+ *  Copyright  (C)  2015-2022  Christian Krause                              *
  *                                                                           *
  *  Christian Krause  <christian.krause@mailbox.org>                         *
  *                                                                           *
@@ -25,14 +25,14 @@
 
 use crate::config::Config;
 
-pub fn debug(message: String, config: &Config) {
+pub fn debug<S: AsRef<str>>(message: S, config: Config) {
     if config.debug {
-        eprintln!("[debug] {}", message);
+        eprintln!("[debug] {}", message.as_ref());
     }
 }
 
-pub fn verbose(message: String, config: &Config) {
+pub fn verbose<S: AsRef<str>>(message: S, config: Config) {
     if config.debug || config.verbose {
-        eprintln!("{}", message);
+        eprintln!("{}", message.as_ref());
     }
 }
