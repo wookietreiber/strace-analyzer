@@ -346,6 +346,8 @@ impl Analysis {
     fn syscall_pread(&mut self, cap: &Captures) {
         let fd: u32 = cap[1].parse().unwrap();
 
+        // ALLOW: false positive: self borrowed both mutable and immutable
+        #[allow(clippy::option_if_let_else)]
         if let Some(summary) = self.fds.get_mut(&fd) {
             let opsize: u64 = cap[2].parse().unwrap();
             let bytes: u64 = cap[3].parse().unwrap();
@@ -358,6 +360,8 @@ impl Analysis {
     fn syscall_pwrite(&mut self, cap: &Captures) {
         let fd: u32 = cap[1].parse().unwrap();
 
+        // ALLOW: false positive: self borrowed both mutable and immutable
+        #[allow(clippy::option_if_let_else)]
         if let Some(summary) = self.fds.get_mut(&fd) {
             let opsize: u64 = cap[2].parse().unwrap();
             let bytes: u64 = cap[3].parse().unwrap();
@@ -370,6 +374,8 @@ impl Analysis {
     fn syscall_read(&mut self, cap: &Captures) {
         let fd: u32 = cap[1].parse().unwrap();
 
+        // ALLOW: false positive: self borrowed both mutable and immutable
+        #[allow(clippy::option_if_let_else)]
         if let Some(summary) = self.fds.get_mut(&fd) {
             let opsize: u64 = cap[2].parse().unwrap();
             let bytes: u64 = cap[3].parse().unwrap();
@@ -394,6 +400,8 @@ impl Analysis {
     fn syscall_write(&mut self, cap: &Captures) {
         let fd: u32 = cap[1].parse().unwrap();
 
+        // ALLOW: false positive: self borrowed both mutable and immutable
+        #[allow(clippy::option_if_let_else)]
         if let Some(summary) = self.fds.get_mut(&fd) {
             let opsize: u64 = cap[2].parse().unwrap();
             let bytes: u64 = cap[3].parse().unwrap();

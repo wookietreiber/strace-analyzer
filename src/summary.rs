@@ -143,7 +143,7 @@ fn humanize(bytes: u64) -> String {
     ByteSize(bytes)
         .to_string_as(true)
         .replace("iB", "")
-        .replace(" ", "")
+        .replace(' ', "")
         .to_uppercase()
 }
 
