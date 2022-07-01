@@ -1,8 +1,6 @@
 strace-analyzer
 ===============
 
-[![Build Status](https://travis-ci.com/wookietreiber/strace-analyzer.svg?branch=master)](https://travis-ci.com/wookietreiber/strace-analyzer)
-
 Analyzes [strace][] output.
 
 
