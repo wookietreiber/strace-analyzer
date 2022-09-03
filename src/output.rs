@@ -27,7 +27,7 @@ use std::str::FromStr;
 
 use anyhow::{anyhow, Result};
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Output {
     Continuous,
     #[cfg(feature = "table")]

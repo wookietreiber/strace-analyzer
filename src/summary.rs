@@ -32,7 +32,7 @@ use prettytable::{cell, format::FormatBuilder, Row, Table};
 use crate::config::Config;
 use crate::log::debug;
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Summary {
     pub file: String,
     pub read_freq: HashMap<u64, u64>,
