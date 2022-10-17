@@ -20,7 +20,7 @@ lazy_static = "1"
 regex = "1"
 
 [dependencies.clap]
-version = "3"
+version = "4"
 features = ["cargo", "wrap_help"]
 
 [dependencies.prettytable-rs]
