@@ -24,7 +24,7 @@ version = "3"
 features = ["cargo", "wrap_help"]
 
 [dependencies.prettytable-rs]
-version = "0.8"
+version = "0.10"
 optional = true
 default_features = false
 
