@@ -39,11 +39,12 @@ impl TryFrom<&ArgMatches> for Config {
     type Error = anyhow::Error;
 
     fn try_from(args: &ArgMatches) -> Result<Self> {
-        let debug = args.is_present("debug");
-        let verbose = args.is_present("verbose");
+        let debug = args.get_flag("debug");
+        let verbose = args.get_flag("verbose");
 
         let output = args
-            .value_of_t("output_format")
+            .get_one::<Output>("output_format")
+            .copied()
             .with_context(|| "no output format specified")?;
 
         Ok(Self {

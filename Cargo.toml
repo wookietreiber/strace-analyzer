@@ -14,17 +14,17 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1"
-atty = "0.2"
 bytesize = "1"
+is-terminal = "0.4"
 lazy_static = "1"
 regex = "1"
 
 [dependencies.clap]
-version = "3"
-features = ["cargo", "wrap_help"]
+version = "4"
+features = ["cargo", "deprecated", "wrap_help"]
 
 [dependencies.prettytable-rs]
-version = "0.9"
+version = "0.10"
 optional = true
 default_features = false
 

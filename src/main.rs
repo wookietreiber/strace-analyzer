@@ -41,7 +41,8 @@ fn main() -> Result<()> {
     let args = cli::build().get_matches();
     let config = Config::try_from(&args)?;
 
-    let input = args.value_of("input").unwrap();
+    // UNWRAP: required via clap
+    let input = args.get_one::<String>("input").unwrap();
 
     analysis::run(input, config)
 }

@@ -26,6 +26,8 @@
 use std::str::FromStr;
 
 use anyhow::{anyhow, Result};
+use clap::builder::PossibleValue;
+use clap::ValueEnum;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Output {
@@ -35,12 +37,12 @@ pub enum Output {
 }
 
 impl Output {
-    pub fn variants() -> Vec<&'static str> {
-        vec![
-            "continuous",
+    pub const fn name(self) -> &'static str {
+        match self {
+            Self::Continuous => "continuous",
             #[cfg(feature = "table")]
-            "table",
-        ]
+            Self::Table => "table",
+        }
     }
 }
 
@@ -67,5 +69,19 @@ impl FromStr for Output {
             "table" => Ok(Self::Table),
             _ => Err(anyhow!("invalid output")),
         }
+    }
+}
+
+impl ValueEnum for Output {
+    fn value_variants<'a>() -> &'a [Self] {
+        &[
+            Self::Continuous,
+            #[cfg(feature = "table")]
+            Self::Table,
+        ]
+    }
+
+    fn to_possible_value(&self) -> Option<PossibleValue> {
+        Some(PossibleValue::new(self.name()))
     }
 }
