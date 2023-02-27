@@ -103,11 +103,11 @@ fn is_file(s: &str) -> Result<String, String> {
     let path = Path::new(&s);
 
     if !path.exists() {
-        Err(format!("does not exist: {:?}", path))
+        Err(format!("does not exist: {}", path.display()))
     } else if path.is_file() {
         Ok(String::from(s))
     } else {
-        Err(format!("is not a file: {:?}", path))
+        Err(format!("is not a file: {}", path.display()))
     }
 }
 

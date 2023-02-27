@@ -164,8 +164,8 @@ impl Analysis {
     {
         if let Some(summary) = self.fds.insert(fd, summary) {
             self.debug(format!(
-                "[{}] dropping {} without explicit close",
-                syscall, summary.file
+                "[{syscall}] dropping {} without explicit close",
+                summary.file
             ));
 
             f(summary);
@@ -178,10 +178,7 @@ impl Analysis {
     {
         let summary = self.fds.get(&oldfd).map_or_else(
             || {
-                self.debug(format!(
-                    "[{}] couldn't find oldfd {}",
-                    syscall, oldfd
-                ));
+                self.debug(format!("[{syscall}] couldn't find oldfd {oldfd}"));
 
                 Summary::new("DUP")
             },
@@ -189,8 +186,7 @@ impl Analysis {
                 let old_file = &summary_old.file;
 
                 self.debug(format!(
-                    "[{}] {} -> {} => {}",
-                    syscall, oldfd, &newfd, old_file
+                    "[{syscall}] {oldfd} -> {newfd} => {old_file}"
                 ));
 
                 Summary::new(old_file)
@@ -214,10 +210,7 @@ impl Analysis {
 
         let trace = input.as_ref().with_extension(pid);
 
-        self.verbose(format!(
-            "[clone] tracing pid {} in {:?} ...",
-            pid, trace
-        ));
+        self.verbose(format!("[clone] tracing pid {pid} in {trace:?} ..."));
 
         let mut cloned_fds = self.fds.clone();
 
@@ -227,7 +220,7 @@ impl Analysis {
 
         self.clone().analyze(&trace, f)?;
 
-        self.verbose(format!("[clone] tracing pid {} finished", pid));
+        self.verbose(format!("[clone] tracing pid {pid} finished"));
 
         Ok(())
     }
@@ -247,11 +240,11 @@ impl Analysis {
             }
 
             (_, "EBADF") => {
-                self.debug(format!("[close] {} => bad fd", fd));
+                self.debug(format!("[close] {fd} => bad fd"));
             }
 
             (_, error) => {
-                self.verbose(format!("[close] {} => {}", fd, error));
+                self.verbose(format!("[close] {fd} => {error}"));
                 self.finish(fd, syscall, f);
             }
         }
@@ -264,7 +257,7 @@ impl Analysis {
         let file = &cap[1];
         let fd: u32 = cap[2].parse().unwrap();
 
-        self.debug(format!("[creat] {} => {}", fd, file));
+        self.debug(format!("[creat] {fd} => {file}"));
 
         let syscall = "creat";
         self.insert(fd, Summary::new(file), syscall, f);
@@ -307,7 +300,7 @@ impl Analysis {
         let file = &cap[1];
         let fd: u32 = cap[2].parse().unwrap();
 
-        self.debug(format!("[open] {} => {}", fd, file));
+        self.debug(format!("[open] {fd} => {file}"));
 
         let syscall = "open";
         self.insert(fd, Summary::new(file), syscall, f);
@@ -323,7 +316,7 @@ impl Analysis {
 
         let file = self.join_paths(dirfd, pathname);
 
-        self.debug(format!("[openat] {} => {}", fd, file));
+        self.debug(format!("[openat] {fd} => {file}"));
 
         let syscall = "openat";
         self.insert(fd, Summary::new(&file), syscall, f);
@@ -336,7 +329,7 @@ impl Analysis {
         let readend = cap[1].parse().unwrap();
         let writeend = cap[2].parse().unwrap();
 
-        self.debug(format!("[pipe] {} => {}", readend, writeend));
+        self.debug(format!("[pipe] {readend} => {writeend}"));
 
         let syscall = "pipe";
         self.insert(readend, Summary::pipe(), syscall, f);
@@ -353,7 +346,7 @@ impl Analysis {
             let bytes: u64 = cap[3].parse().unwrap();
             summary.update_read(opsize, bytes);
         } else {
-            self.verbose(format!("[pread] unknown fd {}", fd));
+            self.verbose(format!("[pread] unknown fd {fd}"));
         }
     }
 
@@ -367,7 +360,7 @@ impl Analysis {
             let bytes: u64 = cap[3].parse().unwrap();
             summary.update_write(opsize, bytes);
         } else {
-            self.verbose(format!("[pwrite] unknown fd {}", fd));
+            self.verbose(format!("[pwrite] unknown fd {fd}"));
         }
     }
 
@@ -381,7 +374,7 @@ impl Analysis {
             let bytes: u64 = cap[3].parse().unwrap();
             summary.update_read(opsize, bytes);
         } else {
-            self.verbose(format!("[read] unknown fd {}", fd));
+            self.verbose(format!("[read] unknown fd {fd}"));
         }
     }
 
@@ -391,7 +384,7 @@ impl Analysis {
     {
         let fd: u32 = cap[1].parse().unwrap();
 
-        self.debug(format!("[socket] {}", fd));
+        self.debug(format!("[socket] {fd}"));
 
         let syscall = "socket";
         self.insert(fd, Summary::socket(), syscall, f);
@@ -407,7 +400,7 @@ impl Analysis {
             let bytes: u64 = cap[3].parse().unwrap();
             summary.update_write(opsize, bytes);
         } else {
-            self.verbose(format!("[write] unknown fd {}", fd));
+            self.verbose(format!("[write] unknown fd {fd}"));
         }
     }
 
@@ -419,7 +412,7 @@ impl Analysis {
             self.debug(format!("[{}] {} => {}", syscall, fd, summary.file));
             f(summary);
         } else {
-            self.verbose(format!("[{}] unknown fd {}", syscall, fd));
+            self.verbose(format!("[{syscall}] unknown fd {fd}"));
         }
     }
 
