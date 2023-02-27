@@ -1,6 +1,6 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                                                                           *
- *  Copyright  (C)  2015-2022  Christian Krause                              *
+ *  Copyright  (C)  2015-2023  Christian Krause                              *
  *                                                                           *
  *  Christian Krause  <christian.krause@mailbox.org>                         *
  *                                                                           *
