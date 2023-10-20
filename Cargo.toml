@@ -11,6 +11,7 @@ repository = "https://github.com/wookietreiber/strace-analyzer"
 keywords = ["strace"]
 categories = ["command-line-utilities"]
 edition = "2021"
+rust-version = "1.70"
 
 [dependencies]
 anyhow = "1"
