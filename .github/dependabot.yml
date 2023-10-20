@@ -1,3 +1,5 @@
+---
+
 version: 2
 
 updates:
@@ -6,8 +8,16 @@ updates:
     directory: /
     schedule:
       interval: weekly
+      day: sunday
+    assignees:
+      - wookietreiber
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+      day: sunday
+    assignees:
+      - wookietreiber
+
+...
