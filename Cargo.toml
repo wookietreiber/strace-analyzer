@@ -35,4 +35,4 @@ table = ["prettytable-rs"]
 [dev-dependencies]
 assert_cmd = "2"
 assert_fs = "1"
-predicates = "2"
+predicates = "3"
