@@ -1,6 +1,6 @@
 [package]
 name = "strace-analyzer"
-version = "0.5.3"
+version = "0.5.4"
 authors = ["Christian Krause <christian.krause@mailbox.org>"]
 description = "analyze strace output"
 license = "GPL-3.0-or-later"
