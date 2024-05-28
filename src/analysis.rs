@@ -196,12 +196,7 @@ impl Analysis {
         self.insert(newfd, summary, syscall, f);
     }
 
-    fn syscall_clone<F, P>(
-        &mut self,
-        cap: &Captures,
-        input: P,
-        f: F,
-    ) -> Result<()>
+    fn syscall_clone<F, P>(&self, cap: &Captures, input: P, f: F) -> Result<()>
     where
         F: Fn(Summary) + Copy,
         P: AsRef<Path>,
