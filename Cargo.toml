@@ -1,6 +1,6 @@
 [package]
 name = "strace-analyzer"
-version = "0.5.5"
+version = "0.5.6"
 authors = ["Christian Krause <christian.krause@mailbox.org>"]
 description = "analyze strace output"
 license = "GPL-3.0-or-later"
@@ -11,7 +11,7 @@ repository = "https://github.com/wookietreiber/strace-analyzer"
 keywords = ["strace"]
 categories = ["command-line-utilities"]
 edition = "2021"
-rust-version = "1.70"
+rust-version = "1.74"
 
 [dependencies]
 anyhow = "1"
