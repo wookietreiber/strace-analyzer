@@ -28,15 +28,15 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
+use std::sync::LazyLock;
 
 use anyhow::Result;
-use lazy_static::lazy_static;
 use regex::{Captures, Regex};
 
 use crate::config::Config;
 use crate::log;
 use crate::output::Output;
-use crate::summary::{show_table, Summary};
+use crate::summary::{Summary, show_table};
 
 pub fn run<P>(input: P, config: Config) -> Result<()>
 where
@@ -447,78 +447,62 @@ impl Analysis {
 // regexes
 // ----------------------------------------------------------------------------
 
-lazy_static! {
-    static ref RE_CLONE: Regex =
-        Regex::new(r"^clone\(.*\)\s+= (\d+)$").unwrap();
-}
+static RE_CLONE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"^clone\(.*\)\s+= (\d+)$").unwrap());
 
-lazy_static! {
-    static ref RE_CLOSE: Regex =
-        Regex::new(r"^close\((\d+)\)\s+= (-?\d+)\s*([A-Z]*).*$").unwrap();
-}
+static RE_CLOSE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"^close\((\d+)\)\s+= (-?\d+)\s*([A-Z]*).*$").unwrap()
+});
 
-lazy_static! {
-    static ref RE_CREAT: Regex =
-        Regex::new(r#"^creat\("([^"]+)", .+\)\s+= (\d+)$"#).unwrap();
-}
+static RE_CREAT: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r#"^creat\("([^"]+)", .+\)\s+= (\d+)$"#).unwrap()
+});
 
-lazy_static! {
-    static ref RE_DUP: Regex =
-        Regex::new(r"^dup\((\d+)\)\s+= (\d+)$").unwrap();
-}
+static RE_DUP: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"^dup\((\d+)\)\s+= (\d+)$").unwrap());
 
-lazy_static! {
-    static ref RE_DUP2: Regex =
-        Regex::new(r"^dup2\((\d+), \d+\)\s+= (\d+)$").unwrap();
-}
+static RE_DUP2: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"^dup2\((\d+), \d+\)\s+= (\d+)$").unwrap());
 
-lazy_static! {
-    static ref RE_FCNTL_DUP: Regex =
-        Regex::new(r"^fcntl\((\d+), F_DUPFD, \d+\)\s+= (\d+)$").unwrap();
-}
+static RE_FCNTL_DUP: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"^fcntl\((\d+), F_DUPFD, \d+\)\s+= (\d+)$").unwrap()
+});
 
-lazy_static! {
-    static ref RE_OPEN: Regex = Regex::new(
+static RE_OPEN: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(
         // we're ignoring failures on purpose because they don't open fd
-        r#"^open\("([^"]+)", .+\)\s+= (\d+)$"#
-    ).unwrap();
-}
+        r#"^open\("([^"]+)", .+\)\s+= (\d+)$"#,
+    )
+    .unwrap()
+});
 
-lazy_static! {
-    static ref RE_OPENAT: Regex =
-        Regex::new(r#"^openat\((\d+|AT_FDCWD), "([^"]+)", .+\)\s+= (\d+)$"#)
-            .unwrap();
-}
+static RE_OPENAT: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r#"^openat\((\d+|AT_FDCWD), "([^"]+)", .+\)\s+= (\d+)$"#)
+        .unwrap()
+});
 
-lazy_static! {
-    static ref RE_PIPE: Regex =
-        Regex::new(r"^pipe\(\[(\d+), (\d+)\]\)\s+= (\d+)$").unwrap();
-}
+static RE_PIPE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"^pipe\(\[(\d+), (\d+)\]\)\s+= (\d+)$").unwrap()
+});
 
-lazy_static! {
-    static ref RE_PREAD: Regex =
-        Regex::new(r"^pread\((\d+),.*, (\d+), \d+\)\s+= (\d+)$").unwrap();
-}
+static RE_PREAD: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"^pread\((\d+),.*, (\d+), \d+\)\s+= (\d+)$").unwrap()
+});
 
-lazy_static! {
-    static ref RE_PWRITE: Regex =
-        Regex::new(r"^pwrite\((\d+),.*, (\d+), \d+\)\s+= (\d+)$").unwrap();
-}
+static RE_PWRITE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"^pwrite\((\d+),.*, (\d+), \d+\)\s+= (\d+)$").unwrap()
+});
 
-lazy_static! {
-    static ref RE_READ: Regex =
-        Regex::new(r"^read\((\d+),.*, (\d+)\)\s+= (\d+)$").unwrap();
-}
+static RE_READ: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"^read\((\d+),.*, (\d+)\)\s+= (\d+)$").unwrap()
+});
 
-lazy_static! {
-    static ref RE_SOCKET: Regex =
-        Regex::new(r"^socket\(.*\)\s+= (\d+)$").unwrap();
-}
+static RE_SOCKET: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"^socket\(.*\)\s+= (\d+)$").unwrap());
 
-lazy_static! {
-    static ref RE_WRITE: Regex =
-        Regex::new(r"^write\((\d+),.*, (\d+)\)\s+= (\d+)$").unwrap();
-}
+static RE_WRITE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"^write\((\d+),.*, (\d+)\)\s+= (\d+)$").unwrap()
+});
 
 // ----------------------------------------------------------------------------
 // tests

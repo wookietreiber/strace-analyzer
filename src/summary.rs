@@ -28,7 +28,7 @@ use std::collections::HashMap;
 use bytesize::ByteSize;
 
 #[cfg(feature = "table")]
-use prettytable::{cell, format::FormatBuilder, Row, Table};
+use prettytable::{Row, Table, cell, format::FormatBuilder};
 
 use crate::config::Config;
 use crate::log::debug;

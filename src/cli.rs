@@ -27,8 +27,8 @@ use std::io::IsTerminal;
 use std::path::Path;
 
 use clap::builder::EnumValueParser;
-use clap::{crate_description, crate_name, crate_version, ArgAction};
 use clap::{Arg, Command};
+use clap::{ArgAction, crate_description, crate_name, crate_version};
 
 use crate::output::Output;
 

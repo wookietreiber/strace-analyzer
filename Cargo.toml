@@ -10,13 +10,12 @@ homepage = "https://github.com/wookietreiber/strace-analyzer"
 repository = "https://github.com/wookietreiber/strace-analyzer"
 keywords = ["strace"]
 categories = ["command-line-utilities"]
-edition = "2021"
-rust-version = "1.74"
+edition = "2024"
+rust-version = "1.85"
 
 [dependencies]
 anyhow = "1"
 bytesize = "2"
-lazy_static = "1"
 regex = "1"
 
 [dependencies.clap]

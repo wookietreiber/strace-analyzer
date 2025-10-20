@@ -25,9 +25,9 @@
 
 use std::str::FromStr;
 
-use anyhow::{anyhow, Result};
-use clap::builder::PossibleValue;
+use anyhow::{Result, anyhow};
 use clap::ValueEnum;
+use clap::builder::PossibleValue;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Output {
