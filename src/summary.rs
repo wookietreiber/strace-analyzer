@@ -23,8 +23,9 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-use bytesize::ByteSize;
 use std::collections::HashMap;
+
+use bytesize::ByteSize;
 
 #[cfg(feature = "table")]
 use prettytable::{cell, format::FormatBuilder, Row, Table};
