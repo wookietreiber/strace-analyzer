@@ -169,7 +169,7 @@ impl Analysis {
             ));
 
             f(summary);
-        };
+        }
     }
 
     fn dup<F>(&mut self, syscall: &str, oldfd: u32, newfd: u32, f: F)
