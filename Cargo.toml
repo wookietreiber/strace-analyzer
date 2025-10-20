@@ -16,7 +16,6 @@ rust-version = "1.74"
 [dependencies]
 anyhow = "1"
 bytesize = "2"
-is-terminal = "0.4"
 lazy_static = "1"
 regex = "1"
 

@@ -23,11 +23,12 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+use std::io::IsTerminal;
+use std::path::Path;
+
 use clap::builder::EnumValueParser;
 use clap::{crate_description, crate_name, crate_version, ArgAction};
 use clap::{Arg, Command};
-use is_terminal::IsTerminal;
-use std::path::Path;
 
 use crate::output::Output;
 

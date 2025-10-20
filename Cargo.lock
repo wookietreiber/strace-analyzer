@@ -601,7 +601,6 @@ dependencies = [
  "assert_fs",
  "bytesize",
  "clap",
- "is-terminal",
  "lazy_static",
  "predicates",
  "prettytable-rs",
