@@ -205,7 +205,10 @@ impl Analysis {
 
         let trace = input.as_ref().with_extension(pid);
 
-        self.verbose(format!("[clone] tracing pid {pid} in {trace:?} ..."));
+        self.verbose(format!(
+            "[clone] tracing pid {pid} in {} ...",
+            trace.display()
+        ));
 
         let mut cloned_fds = self.fds.clone();
 
