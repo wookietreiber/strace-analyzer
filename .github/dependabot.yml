@@ -22,4 +22,13 @@ updates:
     assignees:
       - wookietreiber
 
+  - package-ecosystem: rust-toolchain
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+    assignees:
+      - wookietreiber
+
 ...
