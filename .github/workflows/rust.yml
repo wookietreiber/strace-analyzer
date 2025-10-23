@@ -5,6 +5,7 @@ name: rust
 on:
   pull_request:
     paths:
+      - '.github/workflows/rust.yml'
       - 'Cargo.toml'
       - 'Cargo.lock'
       - '**.rs'
@@ -13,6 +14,7 @@ on:
       - main
       - wip/next
     paths:
+      - '.github/workflows/rust.yml'
       - 'Cargo.toml'
       - 'Cargo.lock'
       - '**.rs'

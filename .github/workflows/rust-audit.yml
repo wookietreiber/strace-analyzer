@@ -5,7 +5,7 @@ name: rust-audit
 on:
   pull_request:
     paths:
-      - .github/workflows/rust-audit.yml
+      - '.github/workflows/rust-audit.yml'
       - '**/Cargo.toml'
       - '**/Cargo.lock'
   push:
@@ -13,7 +13,7 @@ on:
       - main
       - wip/next
     paths:
-      - .github/workflows/rust-audit.yml
+      - '.github/workflows/rust-audit.yml'
       - '**/Cargo.toml'
       - '**/Cargo.lock'
   schedule:
