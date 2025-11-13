@@ -6,6 +6,7 @@ on:
   pull_request:
     paths:
       - '.github/workflows/rust.yml'
+      - 'rust-toolchain.toml'
       - 'Cargo.toml'
       - 'Cargo.lock'
       - '**.rs'
@@ -15,6 +16,7 @@ on:
       - wip/next
     paths:
       - '.github/workflows/rust.yml'
+      - 'rust-toolchain.toml'
       - 'Cargo.toml'
       - 'Cargo.lock'
       - '**.rs'
