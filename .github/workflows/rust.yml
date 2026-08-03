@@ -67,7 +67,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: install cargo-msrv
-        uses: taiki-e/install-action@v2
+        uses: taiki-e/install-action@v2.85.5
         with:
           tool: cargo-msrv
 
