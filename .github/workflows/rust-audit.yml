@@ -20,12 +20,9 @@ on:
     - cron: '0 6 * * 1'
 
 jobs:
-  cargo-audit:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: rustsec/audit-check@v2.0.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+  call-workflow:
+    uses: wookietreiber/workflows/.github/workflows/rust-cargo-audit.yml@main
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
 
 ...
