@@ -6,7 +6,6 @@ description = "analyze strace output"
 license = "GPL-3.0-or-later"
 readme = "README.md"
 documentation = "https://github.com/wookietreiber/strace-analyzer"
-homepage = "https://github.com/wookietreiber/strace-analyzer"
 repository = "https://github.com/wookietreiber/strace-analyzer"
 keywords = ["strace"]
 categories = ["command-line-utilities"]
